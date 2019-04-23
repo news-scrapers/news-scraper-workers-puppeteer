@@ -5,7 +5,7 @@ const randomUA = require('modern-random-ua');
 module.exports = class PuppeteerScraper {
     constructor(configPath= "../config/scrapingConfig.json") {
         this.browser = null;
-        this.page = null;
+        this.pageHistoric = null;
 
         require('dotenv').config();
     }
@@ -25,6 +25,8 @@ module.exports = class PuppeteerScraper {
                 args: ['--no-sandbox']
             });
         }
-        this.page = await this.browser.newPage();
+        this.pageHistoric = await this.browser.newPage();
+        this.pageSingleNew = await this.browser.newPage();
+
     }
 }

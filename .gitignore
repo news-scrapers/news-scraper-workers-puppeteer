@@ -8,6 +8,10 @@ yarn-error.log*
 .idea
 .idea/*
 
+
+scrapingConfig.json
+config/scrapingConfig.json
+
 # Runtime data
 pids
 *.pid

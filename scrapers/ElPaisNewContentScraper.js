@@ -2,10 +2,10 @@ const PuppeteerScraper = require('./PuppeteerScraper');
 const htmlToText = require('html-to-text');
 
 module.exports = class ElPaisNewContentScraper extends PuppeteerScraper {
-    constructor(configPath= "../config/scrapingConfig.json") {
+    constructor(configPath= "../config/scrapingConfig.json", page) {
         super(configPath);
         this.config = require(configPath);
-
+        this.page = page
         this.timeWaitStart = 1 * 1000;
         this.timeWaitClick = 500;
     }
@@ -20,12 +20,15 @@ module.exports = class ElPaisNewContentScraper extends PuppeteerScraper {
         await this.initializePuppeteer();
 
         try {
-            await this.page.goto(url);
+            await this.page.goto(url, {waitUntil: 'load', timeout: 0});
             await this.page.waitFor(this.timeWaitStart);
 
             const div = await this.page.$('div.articulo__interior');
             const headline = await this.extractHeadline(div);
             const content = await  this.extractBody(div);
+
+            await this.browser.close();
+            await this.page.waitFor(this.timeWaitStart);
 
             let results = {headline, content}
             return results;

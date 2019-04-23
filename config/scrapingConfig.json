@@ -1,3 +1,7 @@
 {
-  "urlBase": "http://localhost:8000"
+  "urlBase": "http://localhost:8000",
+  "scraper_id": "scraperElPais",
+  "device_id": "cloud",
+  "app_id": "ElPais",
+  "newspaper": "elpais"
 }

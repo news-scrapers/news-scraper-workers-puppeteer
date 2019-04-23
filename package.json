@@ -4,6 +4,7 @@
   "description": "el-pais-scraper",
   "main": "index.js",
   "scripts": {
+    "start": "node index.js",
     "test": "mocha"
   },
   "repository": {
@@ -17,6 +18,7 @@
   },
   "homepage": "https://github.com/news-scrapers/el-pais-scraper#readme",
   "dependencies": {
+    "axios": "^0.18.0",
     "chai": "^4.2.0",
     "dotenv": "^7.0.0",
     "html-to-text": "^5.1.1",
