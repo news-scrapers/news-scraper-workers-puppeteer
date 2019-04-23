@@ -1,5 +1,6 @@
 const ScraperDataAccess = require("./ScraperDataAccess");
 const ElPaisHistoricScraper = require("./scrapers/ElPaisHistoricScraper");
+const {get} = require('lodash');
 
 const fs = require("fs");
 module.exports = class ScraperApp {
@@ -30,7 +31,7 @@ module.exports = class ScraperApp {
                 });
             }
             this.scrapingIndex.date_scraped = new Date();
-            this.scrapingIndex.last_historic_url = scrapedNews[0].urlHistoric;
+            this.scrapingIndex.last_historic_url = get(scrapedNews,'[0].urlHistoric');
             await this.saveCurrentScrapingIndex();
 
             scrapedCount = scrapedCount + 1;
