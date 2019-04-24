@@ -5,7 +5,6 @@ module.exports = class ElPaisHistoricScraper extends PuppeteerScraper {
     constructor(configPath= "../config/scrapingConfig.json") {
         super(configPath);
         this.config = require(configPath);
-        this.page = 1;
         this.timeWaitStart = 1 * 1000;
         this.timeWaitClick = 500;
     }
@@ -15,15 +14,8 @@ module.exports = class ElPaisHistoricScraper extends PuppeteerScraper {
         //https://elpais.com/tag/fecha/20190305/3
         const dateFormated = this.formatDate(date);
         await this.initializePuppeteer();
-        let results = [];
-        let morePages = true;
         try {
-            while (morePages){
-                const pageResults = await this.scrapPage(dateFormated);
-                results.push(...pageResults)
-                morePages = await this.existsMorePages();
-                this.page = this.page + 1;
-            }
+            let results = await this.scrapPage(dateFormated);
             await this.browser.close();
             await this.pageHistoric.waitFor(this.timeWaitStart);
             return results;
@@ -37,35 +29,30 @@ module.exports = class ElPaisHistoricScraper extends PuppeteerScraper {
 
     async scrapPage(dateFormated){
         let results = [];
-        this.urlHistoric = "https://elpais.com/tag/fecha/" + dateFormated + "/" + this.page;
-
+        this.urlHistoric = "https://www.elmundo.es/elmundo/hemeroteca/" + dateFormated + "/m/espana.html";
         console.log("\n-------");
-        console.log("extracting data for date:" + dateFormated + " in url:");
-        console.log("-- page" + this.page + " --")
+        console.log("extracting data for date: " + dateFormated + " in url:");
         console.log(this.urlHistoric);
         console.log("-------");
 
         await this.pageHistoric.goto(this.urlHistoric, {waitUntil: 'load', timeout: 0});
         //await this.pageHistoric.waitFor(this.timeWaitStart);
         //wait this.clickCookieButton();
-        const divs = await this.pageHistoric.$$('div.articulo__interior');
+        const divs = await this.pageHistoric.$$('a');
         for (const div of divs){
-            const newScrapedHeadline = await this.extractFullData(div)
-            results.push(newScrapedHeadline);
+            const newScrapedHeadline = await this.extractFullData(div);
+            if (newScrapedHeadline){
+                results.push(newScrapedHeadline);
+            }
         }
         return results;
     }
 
-    async existsMorePages(){
-        const button = await this.pageHistoric.$('li.paginacion-anterior');
-        return (button !==undefined && button !==null)
-    }
-    //didomi-dismiss-button
     formatDate(date){
         const month = this.pad(2, '' + (date.getMonth() + 1));
         const  day = this.pad(2,'' + date.getDate());
         const  year = date.getFullYear();
-        return year + month + day;
+        return year +"/"+  month +"/"+  day;
     }
     pad(size, string) {
         while (string.length < (size || 2)) {string = "0" + string;}
@@ -73,29 +60,26 @@ module.exports = class ElPaisHistoricScraper extends PuppeteerScraper {
     }
 
     async extractFullData(div){
-        // articulo-titulo
-        const h2Headline = await div.$('h2');
-        const aHeadline = await div.$('a');
-        const headline = await (await h2Headline.getProperty('textContent')).jsonValue();
+        const aHeadline = div;
+        const headline = await (await aHeadline.getProperty('textContent')).jsonValue();
         const url = await (await aHeadline.getProperty('href')).jsonValue();
-        const content = await this.extractContent(url);
-        //console.log("++++");
-        console.log(url);
-        //console.log(headline.substring(0, 100));
-        //console.log(content.substring(0, 100));
-        //console.log("++++");
-        const urlHistoric = this.urlHistoric;
-        const scraper_id = this.config.scraper_id;
-        const newspaper = this.config.newspaper;
-        const date = this.date;
-        return {headline, url, content, urlHistoric, scraper_id, newspaper, date};
+        if (url.indexOf("www.elmundo.es/espana/")>-1 && url.indexOf("#ancla_comentarios")===-1){
+            const content = await this.extractContent(url);
+            console.log(url);
+
+            const urlHistoric = this.urlHistoric;
+            const scraper_id = this.config.scraper_id;
+            const newspaper = this.config.newspaper;
+            const date = this.date;
+            return {headline, url, content, urlHistoric, scraper_id, newspaper, date}
+        }
     }
 
     async extractContent(url){
         await this.pageSingleNew.goto(url, {waitUntil: 'load', timeout: 0});
         await this.pageSingleNew.waitFor(this.timeWaitStart);
 
-        const div = await this.pageSingleNew.$('div.articulo__interior');
+        const div = await this.pageSingleNew.$('main');
         const content = await this.extractContentFromDiv(div);
         return content;
     }

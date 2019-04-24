@@ -1,5 +1,7 @@
 const ScraperDataAccess = require("./ScraperDataAccess");
 const ElPaisHistoricScraper = require("./scrapers/ElPaisHistoricScraper");
+const ElMundoHistoricScraper = require("./scrapers/ElMundoHistoricScraper");
+
 const {get} = require('lodash');
 
 const fs = require("fs");
@@ -10,7 +12,12 @@ module.exports = class ScraperApp {
 
         this.configPath = "./config/scrapingConfig.json";
         this.config = require(this.configPath);
-        this.historicScaper = new ElPaisHistoricScraper();
+
+        if (this.config.newspaper === "elpais"){
+            this.historicScaper = new ElPaisHistoricScraper();
+        } else if (this.config.newspaper === "elmundo"){
+            this.historicScaper = new ElMundoHistoricScraper();
+        }
         this.maxNewsToScrap = 1000;
         this.dateOffset = (24*60*60*1000) * 1;
 
@@ -41,8 +48,8 @@ module.exports = class ScraperApp {
 
     updateDate(){
         console.log("previous date" + this.scrapingIndex.date_last_new)
-        let dateToScrap = this.scrapingIndex.date_last_new
-        dateToScrap.setTime(this.scrapingIndex.date_last_new - this.dateOffset)
+        let dateToScrap = this.scrapingIndex.date_last_new;
+        dateToScrap.setTime(this.scrapingIndex.date_last_new - this.dateOffset);
         this.scrapingIndex.date_last_new = dateToScrap;
         console.log("current_date" + this.scrapingIndex.date_last_new)
     }
