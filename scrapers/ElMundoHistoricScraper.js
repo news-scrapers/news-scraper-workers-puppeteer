@@ -9,7 +9,7 @@ module.exports = class ElPaisHistoricScraper extends PuppeteerScraper {
         this.timeWaitClick = 500;
     }
 
-    async extractHeadlinesAndUrls(date) {
+    async scrapDate(date) {
         this.date = date;
         //https://elpais.com/tag/fecha/20190305/3
         const dateFormated = this.formatDate(date);

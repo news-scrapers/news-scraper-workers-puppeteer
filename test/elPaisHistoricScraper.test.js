@@ -13,7 +13,7 @@ describe('App', function () {
         const scraper = new ElPaisHistoricScraper();
 
         it('scraping results shoud be not null', async function () {
-            const result = await scraper.extractHeadlinesAndUrls(date);
+            const result = await scraper.scrapDate(date);
             console.log(result);
             assert(result[0] !== undefined);
             assert(result[0].headline !== undefined);
