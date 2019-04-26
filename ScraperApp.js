@@ -62,7 +62,7 @@ module.exports = class ScraperApp {
         if (!this.scrapingIndex || this.scrapingIndex.device_id===""){
             const currentDate = new Date();
             console.log("setting default index");
-            this.scrapingIndex = {date_scraped :currentDate, date_last_new: currentDate, scraper_id: this.config.scraper_id, device_id: this.config.device_id}
+            this.scrapingIndex = {date_scraped :currentDate, date_last_new: currentDate, scraper_id: this.config.scraper_id, device_id: this.config.device_id, newspaper: this.config.newspaper}
         } else {
             this.scrapingIndex.date_last_new = new Date(this.scrapingIndex.date_last_new);
         }

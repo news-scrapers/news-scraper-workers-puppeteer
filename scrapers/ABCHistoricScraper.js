@@ -20,7 +20,7 @@ module.exports = class ElPaisHistoricScraper extends PuppeteerScraper {
             let scrapedPages = [];
             for (let page =1; page<=this.maxPages; page++) {
                 let scrapedPage = await this.scrapPage(dateFormated, page);
-                scrapedPages.push(scrapedPage);
+                if (scrapedPage && scrapedPage.content) scrapedPages.push(scrapedPage);
             }
             return scrapedPages;
             await this.browser.close();
@@ -51,7 +51,7 @@ module.exports = class ElPaisHistoricScraper extends PuppeteerScraper {
         const scraper_id = this.config.scraper_id;
         const newspaper = this.config.newspaper;
         const date = this.date;
-        return {url, content, urlHistoric, scraper_id, newspaper, date, page}
+        return {url, content, urlHistoric, scraper_id, newspaper, date, page, full_page:true}
     }
 
     formatDate(date){
