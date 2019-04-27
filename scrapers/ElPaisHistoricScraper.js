@@ -20,6 +20,12 @@ module.exports = class ElPaisHistoricScraper extends PuppeteerScraper {
         try {
             while (morePages){
                 const pageResults = await this.scrapPage(dateFormated);
+                for (let result of pageResults){
+                   const url = result.url;
+                   const content = await this.extractContent(url);
+                   pageResults.content = content;
+                }
+
                 results.push(...pageResults)
                 morePages = await this.existsMorePages();
                 this.page = this.page + 1;
@@ -50,7 +56,7 @@ module.exports = class ElPaisHistoricScraper extends PuppeteerScraper {
             //wait this.clickCookieButton();
             const divs = await this.pageHistoric.$$('div.articulo__interior');
             for (const div of divs){
-                const newScrapedHeadline = await this.extractFullData(div)
+                const newScrapedHeadline = await this.extractUrlAndHeadline(div)
                 results.push(newScrapedHeadline);
             }
         } catch (err) {
@@ -80,13 +86,13 @@ module.exports = class ElPaisHistoricScraper extends PuppeteerScraper {
         return string;
     }
 
-    async extractFullData(div){
+    async extractUrlAndHeadline(div){
         // articulo-titulo
         const h2Headline = await div.$('h2');
         const aHeadline = await div.$('a');
         const headline = await (await h2Headline.getProperty('textContent')).jsonValue();
         const url = await (await aHeadline.getProperty('href')).jsonValue();
-        const content = await this.extractContent(url);
+        //const content = await this.extractContent(url);
         //console.log("++++");
         console.log(url);
         //console.log(headline.substring(0, 100));
@@ -96,15 +102,18 @@ module.exports = class ElPaisHistoricScraper extends PuppeteerScraper {
         const scraper_id = this.config.scraper_id;
         const newspaper = this.config.newspaper;
         const date = this.date;
-        return {headline, url, content, urlHistoric, scraper_id, newspaper, date};
+        return {headline, url, urlHistoric, scraper_id, newspaper, date};
     }
 
     async extractContent(url){
-        await this.pageSingleNew.goto(url, {waitUntil: 'load', timeout: 0});
-        await this.pageSingleNew.waitFor(this.timeWaitStart);
+        console.log("extracting content of ");
+        console.log(url);
+        await this.pageHistoric.goto(url, {waitUntil: 'load', timeout: 0});
+        await this.pageHistoric.waitFor(this.timeWaitStart);
 
-        const div = await this.pageSingleNew.$('div.articulo__interior');
+        const div = await this.pageHistoric.$('div.articulo__interior');
         const content = await this.extractContentFromDiv(div);
+        console.log(content)
         return content;
     }
 
