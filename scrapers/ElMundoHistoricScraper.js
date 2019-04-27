@@ -7,6 +7,8 @@ module.exports = class ElPaisHistoricScraper extends PuppeteerScraper {
         this.config = require(configPath);
         this.timeWaitStart = 1 * 1000;
         this.timeWaitClick = 500;
+        this.newsCounter = 0;
+
     }
 
     async scrapDate(date) {
@@ -28,6 +30,18 @@ module.exports = class ElPaisHistoricScraper extends PuppeteerScraper {
     }
 
     async scrapPage(dateFormated){
+        const results = await this.extractNewsWithoutContent(dateFormated);
+
+        for (const result of results) {
+            const url = result.url;
+            const content = await this.extractContent(url);
+            result.content = content;
+        }
+
+        return results;
+    }
+
+    async extractNewsWithoutContent(dateFormated) {
         let results = [];
         this.urlHistoric = "https://www.elmundo.es/elmundo/hemeroteca/" + dateFormated + "/m/espana.html";
         console.log("\n-------");
@@ -40,7 +54,7 @@ module.exports = class ElPaisHistoricScraper extends PuppeteerScraper {
         //wait this.clickCookieButton();
         const divs = await this.pageHistoric.$$('a');
         for (const div of divs){
-            const newScrapedHeadline = await this.extractFullData(div);
+            const newScrapedHeadline = await this.extractUrlHeadline(div);
             if (newScrapedHeadline){
                 results.push(newScrapedHeadline);
             }
@@ -59,28 +73,34 @@ module.exports = class ElPaisHistoricScraper extends PuppeteerScraper {
         return string;
     }
 
-    async extractFullData(div){
+    async extractUrlHeadline(div){
         const aHeadline = div;
         const headline = await (await aHeadline.getProperty('textContent')).jsonValue();
         const url = await (await aHeadline.getProperty('href')).jsonValue();
         if (url.indexOf("www.elmundo.es/espana/")>-1 && url.indexOf("#ancla_comentarios")===-1){
-            const content = await this.extractContent(url);
             console.log(url);
-
             const urlHistoric = this.urlHistoric;
             const scraper_id = this.config.scraper_id;
             const newspaper = this.config.newspaper;
             const date = this.date;
-            return {headline, url, content, urlHistoric, scraper_id, newspaper, date}
+            return {headline, url, urlHistoric, scraper_id, newspaper, date}
         }
     }
 
     async extractContent(url){
+        console.log("---");
+        console.log("extracting content of ");
+        console.log(url);
         await this.pageSingleNew.goto(url, {waitUntil: 'load', timeout: 0});
         await this.pageSingleNew.waitFor(this.timeWaitStart);
 
         const div = await this.pageSingleNew.$('main');
         const content = await this.extractContentFromDiv(div);
+        this.newsCounter = this. newsCounter+1;
+        if (this.newsCounter > 4 ){
+            await this.reopenBrowser();
+            this.newsCounter = 0;
+        }
         return content;
     }
 

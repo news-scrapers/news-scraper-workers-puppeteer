@@ -8,6 +8,7 @@ module.exports = class ElPaisHistoricScraper extends PuppeteerScraper {
         this.page = 1;
         this.timeWaitStart = 1 * 1000;
         this.timeWaitClick = 500;
+        this.newsCounter = 0;
     }
 
     async scrapDate(date) {
@@ -114,6 +115,11 @@ module.exports = class ElPaisHistoricScraper extends PuppeteerScraper {
         const div = await this.pageHistoric.$('div.articulo__interior');
         const content = await this.extractContentFromDiv(div);
         console.log(content)
+        this.newsCounter = this. newsCounter+1;
+        if (this.newsCounter > 4 ){
+            await this.reopenBrowser();
+            this.newsCounter = 0;
+        }
         return content;
     }
 

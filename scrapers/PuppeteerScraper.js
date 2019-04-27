@@ -29,4 +29,9 @@ module.exports = class PuppeteerScraper {
         this.pageSingleNew = await this.browser.newPage();
 
     }
+
+    async reopenBrowser() {
+        await this.browser.close();
+        await this.initializePuppeteer()
+    }
 }
