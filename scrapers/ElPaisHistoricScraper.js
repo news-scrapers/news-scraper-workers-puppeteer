@@ -44,21 +44,29 @@ module.exports = class ElPaisHistoricScraper extends PuppeteerScraper {
         console.log("-- page" + this.page + " --")
         console.log(this.urlHistoric);
         console.log("-------");
-
-        await this.pageHistoric.goto(this.urlHistoric, {waitUntil: 'load', timeout: 0});
-        //await this.pageHistoric.waitFor(this.timeWaitStart);
-        //wait this.clickCookieButton();
-        const divs = await this.pageHistoric.$$('div.articulo__interior');
-        for (const div of divs){
-            const newScrapedHeadline = await this.extractFullData(div)
-            results.push(newScrapedHeadline);
+        try {
+            await this.pageHistoric.goto(this.urlHistoric, {waitUntil: 'load', timeout: 0});
+            //await this.pageHistoric.waitFor(this.timeWaitStart);
+            //wait this.clickCookieButton();
+            const divs = await this.pageHistoric.$$('div.articulo__interior');
+            for (const div of divs){
+                const newScrapedHeadline = await this.extractFullData(div)
+                results.push(newScrapedHeadline);
+            }
+        } catch (err) {
+            console.log(err);
         }
         return results;
     }
 
     async existsMorePages(){
-        const button = await this.pageHistoric.$('li.paginacion-anterior');
-        return (button !==undefined && button !==null)
+        try {
+            const button = await this.pageHistoric.$('li.paginacion-anterior');
+            return (button !==undefined && button !==null);
+        } catch (err) {
+            console.log(err);
+        }
+
     }
     //didomi-dismiss-button
     formatDate(date){
