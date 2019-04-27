@@ -7,7 +7,7 @@ yarn-error.log*
 
 .idea
 .idea/*
-
+config/scrapingConfig.json
 
 scrapingConfig.json
 config/scrapingConfig.json
