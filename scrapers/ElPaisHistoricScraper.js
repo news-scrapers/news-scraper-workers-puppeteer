@@ -24,7 +24,7 @@ module.exports = class ElPaisHistoricScraper extends PuppeteerScraper {
                 for (let result of pageResults){
                    const url = result.url;
                    const content = await this.extractContent(url);
-                   pageResults.content = content;
+                    result.content = content;
                 }
 
                 results.push(...pageResults)

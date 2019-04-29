@@ -1,7 +1,7 @@
 {
   "urlBase": "http://localhost:8000",
-  "scraper_id": "scraperABC",
+  "scraper_id": "scraperelpais",
   "device_id": "cloud",
-  "app_id": "ABC",
-  "newspaper": "abc"
+  "app_id": "elpais",
+  "newspaper": "elpais"
 }
