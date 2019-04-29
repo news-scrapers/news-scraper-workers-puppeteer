@@ -2,6 +2,7 @@ const ScraperDataAccess = require("./ScraperDataAccess");
 const ElPaisHistoricScraper = require("./scrapers/ElPaisHistoricScraper");
 const ElMundoHistoricScraper = require("./scrapers/ElMundoHistoricScraper");
 const ABCHistoricScraper = require("./scrapers/ABCHistoricScraper");
+const LaVanguardiaHistoricScraper = require("./scrapers/LaVanguardiaHistoricScraper");
 
 const {get} = require('lodash');
 
@@ -20,6 +21,8 @@ module.exports = class ScraperApp {
             this.historicScaper = new ElMundoHistoricScraper();
         } else if (this.config.newspaper === "abc"){
             this.historicScaper = new ABCHistoricScraper();
+        } else if (this.config.newspaper === "lavanguardia"){
+            this.historicScaper = new LaVanguardiaHistoricScraper();
         }
         this.maxDaysToScrap = 1000;
         this.dateOffset = (24*60*60*1000) * 1;

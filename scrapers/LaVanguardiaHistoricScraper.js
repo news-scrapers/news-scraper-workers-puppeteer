@@ -13,23 +13,20 @@ module.exports = class ElPaisHistoricScraper extends PuppeteerScraper {
 
     async scrapDate(date) {
         this.date = date;
-        //https://elpais.com/tag/fecha/20190305/3
+        //http://hemeroteca.lavanguardia.com/edition.html?bd=31&bm=12&by=2018&page=6
         const dateFormated = this.formatDate(date);
         await this.initializePuppeteer();
         let results = [];
-        let morePages = true;
         try {
-            while (morePages){
-                const pageResults = await this.scrapPage(dateFormated);
-                for (let result of pageResults){
-                   const url = result.url;
-                   const content = await this.extractContent(url);
-                   pageResults.content = content;
+            for (let page =1; page<=6; page++){
+                const urls = await this.extractNewsPagesUrls(dateFormated, page);
+                const pageResults = [];
+                for (let index =0; index<urls.length; index++){
+                   const result = await this.extractFullPageNews(urls[index], index+1);
+                   pageResults.push(result)
                 }
 
                 results.push(...pageResults)
-                morePages = await this.existsMorePages();
-                this.page = this.page + 1;
             }
             await this.browser.close();
             await this.pageHistoric.waitFor(this.timeWaitStart);
@@ -42,9 +39,9 @@ module.exports = class ElPaisHistoricScraper extends PuppeteerScraper {
         }
     }
 
-    async scrapPage(dateFormated){
+    async extractNewsPagesUrls(dateFormated, page){
         let results = [];
-        this.urlHistoric = "https://elpais.com/tag/fecha/" + dateFormated + "/" + this.page;
+        this.urlHistoric = "http://hemeroteca.lavanguardia.com/edition.html?" + dateFormated + "&ed=&em=&ey=?page=" + page;
 
         console.log("\n-------");
         console.log("extracting data for date:" + dateFormated + " in url:");
@@ -53,12 +50,11 @@ module.exports = class ElPaisHistoricScraper extends PuppeteerScraper {
         console.log("-------");
         try {
             await this.pageHistoric.goto(this.urlHistoric, {waitUntil: 'load', timeout: 0});
-            //await this.pageHistoric.waitFor(this.timeWaitStart);
-            //wait this.clickCookieButton();
-            const divs = await this.pageHistoric.$$('div.articulo__interior');
-            for (const div of divs){
-                const newScrapedHeadline = await this.extractUrlAndHeadline(div)
-                results.push(newScrapedHeadline);
+
+            const links = await this.pageHistoric.$$('a.portada');
+            for (const link of links){
+                const url = await (await link.getProperty('href')).jsonValue();
+                results.push(url);
             }
         } catch (err) {
             console.log(err);
@@ -66,61 +62,38 @@ module.exports = class ElPaisHistoricScraper extends PuppeteerScraper {
         return results;
     }
 
-    async existsMorePages(){
-        try {
-            const button = await this.pageHistoric.$('li.paginacion-anterior');
-            return (button !==undefined && button !==null);
-        } catch (err) {
-            console.log(err);
-        }
-
-    }
-    //didomi-dismiss-button
+    //bd=31&bm=12&by=2018
     formatDate(date){
         const month = this.pad(2, '' + (date.getMonth() + 1));
         const  day = this.pad(2,'' + date.getDate());
         const  year = date.getFullYear();
-        return year + month + day;
+        return `bd=${day}&bm=${month}&by=${year}`
     }
     pad(size, string) {
         while (string.length < (size || 2)) {string = "0" + string;}
         return string;
     }
 
-    async extractUrlAndHeadline(div){
-        // articulo-titulo
-        const h2Headline = await div.$('h2');
-        const aHeadline = await div.$('a');
-        const headline = await (await h2Headline.getProperty('textContent')).jsonValue();
-        const url = await (await aHeadline.getProperty('href')).jsonValue();
-        //const content = await this.extractFullPageNews(url);
-        //console.log("++++");
-        console.log(url);
-        //console.log(headline.substring(0, 100));
-        //console.log(content.substring(0, 100));
-        //console.log("++++");
-        const urlHistoric = this.urlHistoric;
-        const scraper_id = this.config.scraper_id;
-        const newspaper = this.config.newspaper;
-        const date = this.date;
-        return {headline, url, urlHistoric, scraper_id, newspaper, date};
-    }
-
-    async extractContent(url){
+    async extractFullPageNews(url, page){
         console.log("extracting content of ");
         console.log(url);
         await this.pageHistoric.goto(url, {waitUntil: 'load', timeout: 0});
         await this.pageHistoric.waitFor(this.timeWaitStart);
 
-        const div = await this.pageHistoric.$('div.articulo__interior');
-        const content = await this.extractContentFromDiv(div);
-        console.log(content)
+        //await page.$eval( 'a#topbar-search', form => form.click() );
+        const ocr = await this.pageHistoric.$('h3.text');
+        const content = await this.extractContentFromDiv(ocr);
+
         this.newsCounter = this. newsCounter+1;
         if (this.newsCounter > 4 ){
             await this.reopenBrowser();
             this.newsCounter = 0;
         }
-        return content;
+        const urlHistoric = this.urlHistoric;
+        const scraper_id = this.config.scraper_id;
+        const newspaper = this.config.newspaper;
+        const date = this.date;
+        return {url, urlHistoric, scraper_id, newspaper, date, content, page, full_page:true}
     }
 
     async extractContentFromDiv(div){
