@@ -13,6 +13,7 @@ module.exports = class ElPaisHistoricScraper extends PuppeteerScraper {
 
     async scrapDate(date) {
         this.date = date;
+        this.page = 1;
         //https://elpais.com/tag/fecha/20190305/3
         const dateFormated = this.formatDate(date);
         await this.initializePuppeteer();
