@@ -56,11 +56,12 @@ module.exports = class ElPaisHistoricScraper extends PuppeteerScraper {
             //wait this.clickCookieButton();
             const divs = await this.pageHistoric.$$('div.articulo__interior');
             for (const div of divs){
-                const newScrapedHeadline = await this.extractUrlAndHeadline(div)
+                const newScrapedHeadline = await this.extractUrlAndHeadline(div);
                 results.push(newScrapedHeadline);
             }
         } catch (err) {
             console.log(err);
+            throw err;
         }
         return results;
     }
@@ -71,6 +72,7 @@ module.exports = class ElPaisHistoricScraper extends PuppeteerScraper {
             return (button !==undefined && button !==null);
         } catch (err) {
             console.log(err);
+            throw err;
         }
 
     }
@@ -88,21 +90,23 @@ module.exports = class ElPaisHistoricScraper extends PuppeteerScraper {
 
     async extractUrlAndHeadline(div){
         // articulo-titulo
-        const h2Headline = await div.$('h2');
-        const aHeadline = await div.$('a');
-        const headline = await (await h2Headline.getProperty('textContent')).jsonValue();
-        const url = await (await aHeadline.getProperty('href')).jsonValue();
-        //const content = await this.extractFullPageNews(url);
-        //console.log("++++");
-        console.log(url);
-        //console.log(headline.substring(0, 100));
-        //console.log(content.substring(0, 100));
-        //console.log("++++");
-        const urlHistoric = this.urlHistoric;
-        const scraper_id = this.config.scraper_id;
-        const newspaper = this.config.newspaper;
-        const date = this.date;
-        return {headline, url, urlHistoric, scraper_id, newspaper, date};
+        if (div) {
+            const h2Headline = await div.$('h2');
+            const aHeadline = await div.$('a');
+            const headline = await (await h2Headline.getProperty('textContent')).jsonValue();
+            const url = await (await aHeadline.getProperty('href')).jsonValue();
+            //const content = await this.extractFullPageNews(url);
+            //console.log("++++");
+            console.log(url);
+            //console.log(headline.substring(0, 100));
+            //console.log(content.substring(0, 100));
+            //console.log("++++");
+            const urlHistoric = this.urlHistoric;
+            const scraper_id = this.config.scraper_id;
+            const newspaper = this.config.newspaper;
+            const date = this.date;
+            return {headline, url, urlHistoric, scraper_id, newspaper, date};
+        }
     }
 
     async extractContent(url){
