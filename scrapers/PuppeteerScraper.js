@@ -28,6 +28,21 @@ module.exports = class PuppeteerScraper {
         this.pageHistoric = await this.browser.newPage();
         this.pageSingleNew = await this.browser.newPage();
 
+        function handleClose(msg){
+            console.log(msg);
+            page.close();
+            browser.close();
+            process.exit(1);
+        }
+
+        process.on("uncaughtException", () => {
+            handleClose(`I crashed`);
+        });
+
+        process.on("unhandledRejection", () => {
+            handleClose(`I was rejected`);
+        });
+
     }
 
     async reopenBrowser() {
