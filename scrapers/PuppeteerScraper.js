@@ -12,6 +12,7 @@ module.exports = class PuppeteerScraper {
 
     async initializePuppeteer() {
         if (process.env['RASPBERRY_MODE']) {
+            console.log("initializing puppeteer using raspberry config");
             this.browser = await puppeteer.launch({
                 executablePath: '/usr/bin/chromium-browser',
                 userAgent: randomUA.generate(),
@@ -19,6 +20,7 @@ module.exports = class PuppeteerScraper {
                 args: ['--no-sandbox', '--disable-setuid-sandbox']
             });
         } else {
+            console.log("initializing puppeteer");
             this.browser = await puppeteer.launch({
                 userAgent: randomUA.generate(),
                 headless: true,
