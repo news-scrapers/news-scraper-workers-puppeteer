@@ -4,7 +4,6 @@ const htmlToText = require('html-to-text');
 module.exports = class ElPaisNewContentScraper extends PuppeteerScraper {
     constructor(configPath= "../config/scrapingConfig.json", page) {
         super(configPath);
-        this.config = require(configPath);
         this.page = page
         this.timeWaitStart = 1 * 1000;
         this.timeWaitClick = 500;

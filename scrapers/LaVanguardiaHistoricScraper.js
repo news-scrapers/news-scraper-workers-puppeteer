@@ -4,7 +4,6 @@ const htmlToText = require('html-to-text');
 module.exports = class ElPaisHistoricScraper extends PuppeteerScraper {
     constructor(configPath= "../config/scrapingConfig.json") {
         super(configPath);
-        this.config = require(configPath);
         this.page = 1;
         this.timeWaitStart = 1 * 1000;
         this.timeWaitClick = 500;
@@ -93,7 +92,8 @@ module.exports = class ElPaisHistoricScraper extends PuppeteerScraper {
         const scraper_id = this.config.scraper_id;
         const newspaper = this.config.newspaper;
         const date = this.date;
-        return {url, urlHistoric, scraper_id, newspaper, date, content, page, full_page:true}
+        const id = this.generateId();
+        return {url, urlHistoric, scraper_id, newspaper, date, content, page, full_page:true, id};
     }
 
     async extractContentFromDiv(div){

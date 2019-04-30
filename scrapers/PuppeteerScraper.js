@@ -1,9 +1,11 @@
 const puppeteer = require('puppeteer');
 const randomUA = require('modern-random-ua');
+const uuidv1 = require('uuid/v1');
 
 
 module.exports = class PuppeteerScraper {
     constructor(configPath= "../config/scrapingConfig.json") {
+        this.config = require(configPath);
         this.browser = null;
         this.pageHistoric = null;
 
@@ -50,5 +52,11 @@ module.exports = class PuppeteerScraper {
     async reopenBrowser() {
         await this.browser.close();
         await this.initializePuppeteer()
+    }
+
+    generateId(){
+        let date = new Date().toString().replace(new RegExp(" ", 'g'), "_").replace(new RegExp(":", 'g'), "_").replace(new RegExp(",", 'g'), "_").replace("+", "_");
+        date = date.split("_GMT")[0];
+        return this.config.scraper_id + "-" + date + "-" + uuidv1()
     }
 }

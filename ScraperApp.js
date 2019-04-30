@@ -43,7 +43,7 @@ module.exports = class ScraperApp {
                     await this.api.saveNew(scrapedNew);
                 });
             }
-            this.scrapingIndex.date_scraped = new Date();
+            this.scrapingIndex.date_scraped = new Date(Date.now());
             this.scrapingIndex.last_historic_url = get(scrapedNews,'[0].urlHistoric');
             await this.saveCurrentScrapingIndex();
 
