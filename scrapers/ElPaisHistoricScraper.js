@@ -113,15 +113,20 @@ module.exports = class ElPaisHistoricScraper extends PuppeteerScraper {
     async extractContent(url){
         console.log("extracting content of ");
         console.log(url);
-        await this.pageHistoric.goto(url, {waitUntil: 'load', timeout: 0});
-        const div = await this.pageHistoric.$('div.articulo__interior');
-        const content = await this.extractContentFromDiv(div);
-        this.newsCounter = this. newsCounter+1;
-        if (this.newsCounter > 4 ){
-            await this.reopenBrowser();
-            this.newsCounter = 0;
+        try{
+            await this.pageHistoric.goto(url, {waitUntil: 'load', timeout: 0});
+            const div = await this.pageHistoric.$('div.articulo__interior');
+            const content = await this.extractContentFromDiv(div);
+            this.newsCounter = this. newsCounter+1;
+            if (this.newsCounter > 4 ){
+                await this.reopenBrowser();
+                this.newsCounter = 0;
+            }
+            return content;
+        } catch (err) {
+          console.log(err);
         }
-        return content;
+
     }
 
     async extractContentFromDiv(div){
