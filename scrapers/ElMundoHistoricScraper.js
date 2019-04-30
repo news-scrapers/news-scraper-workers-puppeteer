@@ -48,18 +48,19 @@ module.exports = class ElPaisHistoricScraper extends PuppeteerScraper {
         console.log("extracting data for date: " + dateFormated + " in url:");
         console.log(this.urlHistoric);
         console.log("-------");
-
-        await this.pageHistoric.goto(this.urlHistoric, {waitUntil: 'load', timeout: 0});
-        //await this.pageHistoric.waitFor(this.timeWaitStart);
-        //wait this.clickCookieButton();
-        const divs = await this.pageHistoric.$$('a');
-        for (const div of divs){
-            const newScrapedHeadline = await this.extractUrlHeadline(div);
-            if (newScrapedHeadline){
-                results.push(newScrapedHeadline);
+        try {
+            await this.pageHistoric.goto(this.urlHistoric, {waitUntil: 'load', timeout: 0});
+            const divs = await this.pageHistoric.$$('a');
+            for (const div of divs){
+                const newScrapedHeadline = await this.extractUrlHeadline(div);
+                if (newScrapedHeadline){
+                    results.push(newScrapedHeadline);
+                }
             }
+            return results;
+        } catch (err) {
+            console.log(err);
         }
-        return results;
     }
 
     formatDate(date){
@@ -91,17 +92,22 @@ module.exports = class ElPaisHistoricScraper extends PuppeteerScraper {
         console.log("---");
         console.log("extracting content of ");
         console.log(url);
-        await this.pageSingleNew.goto(url, {waitUntil: 'load', timeout: 0});
-        await this.pageSingleNew.waitFor(this.timeWaitStart);
+        try {
+            await this.pageSingleNew.goto(url, {waitUntil: 'load', timeout: 0});
+            await this.pageSingleNew.waitFor(this.timeWaitStart);
 
-        const div = await this.pageSingleNew.$('main');
-        const content = await this.extractContentFromDiv(div);
-        this.newsCounter = this. newsCounter+1;
-        if (this.newsCounter > 4 ){
-            await this.reopenBrowser();
-            this.newsCounter = 0;
+            const div = await this.pageSingleNew.$('main');
+            const content = await this.extractContentFromDiv(div);
+            this.newsCounter = this. newsCounter+1;
+            if (this.newsCounter > 4 ){
+                await this.reopenBrowser();
+                this.newsCounter = 0;
+            }
+            return content;
+        } catch (err) {
+            console.log(err);
         }
-        return content;
+
     }
 
     async extractContentFromDiv(div){
