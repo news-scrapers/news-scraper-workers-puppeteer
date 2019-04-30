@@ -62,7 +62,7 @@ module.exports = class ElPaisHistoricScraper extends PuppeteerScraper {
             }
         } catch (err) {
             console.log(err);
-            throw err;
+            //throw err;
         }
         return results;
     }
@@ -73,7 +73,7 @@ module.exports = class ElPaisHistoricScraper extends PuppeteerScraper {
             return (button !==undefined && button !==null);
         } catch (err) {
             console.log(err);
-            throw err;
+            //throw err;
         }
 
     }
