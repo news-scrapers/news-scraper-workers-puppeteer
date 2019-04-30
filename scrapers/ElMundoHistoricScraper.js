@@ -83,7 +83,7 @@ module.exports = class ElPaisHistoricScraper extends PuppeteerScraper {
             const scraper_id = this.config.scraper_id;
             const newspaper = this.config.newspaper;
             const date = this.date;
-            const id = this.generateId();
+            const id = this.generateId(date);
             return {headline, url, urlHistoric, scraper_id, newspaper, date, id};
         }
     }

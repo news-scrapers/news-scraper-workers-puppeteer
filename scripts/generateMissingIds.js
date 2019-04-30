@@ -1,7 +1,7 @@
 const mongoClient = require('mongodb').MongoClient;
-require('dotenv').load();
+require('dotenv').config();
 const uuidv1 = require('uuid/v1');
-mongoUrl = process.env['MONGO_URL'];
+mongoUrl = process.env['MONGODB_URL'];
 
 
 const updateDocumentId = (document) => {
@@ -14,12 +14,19 @@ const updateDocumentId = (document) => {
             const collectionName = "NewsContentScraped";
             const dbName = "testing";
             const collection = client.db(dbName).collection(collectionName);
-            const id = document.scraper_id +"-"+ (new Date()).toString() + "-" + uuidv1();
-            document.id = id;
-            let res = collection.save(document, resolve);
+
+            if (!document.id || (document.id.indexOf("GTM"))){
+                let date = document.date.toString().replace(new RegExp(" ", 'g'), "_").replace(new RegExp(":", 'g'), "_").replace(new RegExp(",", 'g'), "_").replace("+", "_");
+                date = date.split("_GMT")[0];
+                const id = document.scraper_id +"-" + date + "-" + uuidv1();
+                document.id = id;
+                console.log("---updating----");
+                let res = collection.save(document, resolve);
+            }
         });
     });
 }
+console.log(mongoUrl);
 
 mongoClient.connect(mongoUrl, async function (err, client) {
     if (err) {
@@ -31,6 +38,8 @@ mongoClient.connect(mongoUrl, async function (err, client) {
     const collection = client.db(dbName).collection(collectionName);
     let cursor = collection.find({'id':null});
     await cursor.each(async function (err, item) {
+        console.log(item.date);
+        console.log(item.content.substring(0,100));
         await updateDocumentId(item);
     });
 });

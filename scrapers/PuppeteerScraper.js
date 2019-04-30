@@ -54,8 +54,8 @@ module.exports = class PuppeteerScraper {
         await this.initializePuppeteer()
     }
 
-    generateId(){
-        let date = new Date().toString().replace(new RegExp(" ", 'g'), "_").replace(new RegExp(":", 'g'), "_").replace(new RegExp(",", 'g'), "_").replace("+", "_");
+    generateId(dateNews = new Date()){
+        let date = dateNews.toString().replace(new RegExp(" ", 'g'), "_").replace(new RegExp(":", 'g'), "_").replace(new RegExp(",", 'g'), "_").replace("+", "_");
         date = date.split("_GMT")[0];
         return this.config.scraper_id + "-" + date + "-" + uuidv1()
     }
