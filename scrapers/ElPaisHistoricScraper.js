@@ -4,7 +4,7 @@ const htmlToText = require('html-to-text');
 module.exports = class ElPaisHistoricScraper extends PuppeteerScraper {
     constructor(configPath= "../config/scrapingConfig.json") {
         super(configPath);
-        this.page = 1;
+        this.page = 0;
         this.timeWaitStart = 1 * 1000;
         this.timeWaitClick = 500;
         this.newsCounter = 0;
@@ -12,7 +12,7 @@ module.exports = class ElPaisHistoricScraper extends PuppeteerScraper {
 
     async scrapDate(date) {
         this.date = date;
-        this.page = 1;
+        this.page = 0;
         //https://elpais.com/tag/fecha/20190305/3
         const dateFormated = this.formatDate(date);
         await this.initializePuppeteer();
