@@ -68,10 +68,12 @@ module.exports = class ScraperApp {
             this.scrapingIndex = {date_scraping :currentDate, date_last_new: currentDate, scraper_id: this.config.scraper_id, device_id: this.config.device_id, newspaper: this.config.newspaper}
         } else {
             this.scrapingIndex.date_last_new = new Date(this.scrapingIndex.date_last_new);
+            this.scrapingIndex.date_scraping = new Date();
         }
         console.log(this.scrapingIndex);
     }
     async saveCurrentScrapingIndex(){
+        this.scrapingIndex.date_scraping = new Date();
         await this.api.saveScrapingIndex(this.scrapingIndex);
     }
 } 

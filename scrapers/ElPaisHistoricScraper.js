@@ -72,7 +72,7 @@ module.exports = class ElPaisHistoricScraper extends PuppeteerScraper {
 
     async existsMorePages(){
         try {
-            return this.page<10
+            return this.page<1
             //const button = await this.pageHistoric.$('li.paginacion-anterior');
             //return (button !==undefined && button !==null);
         } catch (err) {
