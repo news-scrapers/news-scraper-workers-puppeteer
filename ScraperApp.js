@@ -54,11 +54,10 @@ module.exports = class ScraperApp {
 
     updateDate(){
         console.log("previous date" + this.scrapingIndex.date_last_new)
-        let dateToScrap = new Date(this.scrapingIndex.date_last_new);
+        let dateToScrap = this.scrapingIndex.date_last_new;
         dateToScrap.setTime(this.scrapingIndex.date_last_new - this.dateOffset);
         this.scrapingIndex.date_last_new = dateToScrap;
         console.log("current_date" + this.scrapingIndex.date_last_new)
-        this.scrapingIndex.date_scraping = new Date();
     }
     async getCurrentScrapingIndex(){
         this.scrapingIndex = await this.api.getScrapingIndex(this.config.scraper_id);
@@ -67,6 +66,8 @@ module.exports = class ScraperApp {
             const currentDate = new Date();
             console.log("setting default index");
             this.scrapingIndex = {date_scraping :currentDate, date_last_new: currentDate, scraper_id: this.config.scraper_id, device_id: this.config.device_id, newspaper: this.config.newspaper}
+        } else {
+            this.scrapingIndex.date_last_new = new Date(this.scrapingIndex.date_last_new);
         }
         console.log(this.scrapingIndex);
     }
