@@ -54,7 +54,7 @@ module.exports = class ScraperApp {
 
     updateDate(){
         console.log("previous date" + this.scrapingIndex.date_last_new)
-        let dateToScrap = this.scrapingIndex.date_last_new;
+        let dateToScrap = new Date(this.scrapingIndex.date_last_new);
         dateToScrap.setTime(this.scrapingIndex.date_last_new - this.dateOffset);
         this.scrapingIndex.date_last_new = dateToScrap;
         console.log("current_date" + this.scrapingIndex.date_last_new)
