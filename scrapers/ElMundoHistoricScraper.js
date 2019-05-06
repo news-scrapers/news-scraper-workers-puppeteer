@@ -77,7 +77,7 @@ module.exports = class ElPaisHistoricScraper extends PuppeteerScraper {
         const aHeadline = div;
         const headline = await (await aHeadline.getProperty('textContent')).jsonValue();
         const url = await (await aHeadline.getProperty('href')).jsonValue();
-        if (url.indexOf("www.elmundo.es/espana/")>-1 && url.indexOf("#ancla_comentarios")===-1){
+        if (this.urlIsANew(url)){
             console.log(url);
             const urlHistoric = this.urlHistoric;
             const scraper_id = this.config.scraper_id;
@@ -86,6 +86,20 @@ module.exports = class ElPaisHistoricScraper extends PuppeteerScraper {
             const id = this.generateId(date);
             return {headline, url, urlHistoric, scraper_id, newspaper, date, id};
         }
+    }
+
+    urlIsANew(url){
+        return url.endsWith(".html") && url.indexOf("#ancla_comentarios")===-1
+            && url.indexOf("/vivienda.html")===-1
+            && url.indexOf("/expansion-empleo.html")===-1
+            && url.indexOf("/codigo-etico.html")===-1
+            && url.indexOf("/avisolegal.html")===-1
+            && url.indexOf("/contacto.html")===-1
+            && url.indexOf("/menu.html")===-1
+            && url.indexOf("/archivo.html")===-1
+            && url.indexOf("/espana.html")===-1
+            && url.indexOf("/noticias-mas-leidas.html")===-1
+            && url.indexOf("/index.html")===-1
     }
 
     async extractContent(url){
