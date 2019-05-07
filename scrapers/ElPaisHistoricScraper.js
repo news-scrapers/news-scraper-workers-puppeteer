@@ -124,7 +124,7 @@ module.exports = class ElPaisHistoricScraper extends PuppeteerScraper {
             const div = await this.pageHistoric.$('div.articulo__interior');
             const content = await this.extractContentFromDiv(div);
             this.newsCounter = this. newsCounter+1;
-            if (this.newsCounter > 4 ){
+            if (this.newsCounter > 3 ){
                 await this.reopenBrowser();
                 this.newsCounter = 0;
             }
