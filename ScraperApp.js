@@ -63,7 +63,11 @@ module.exports = class ScraperApp {
         this.scrapingIndex = await this.api.getScrapingIndex(this.config.scraper_id);
         console.log(this.scrapingIndex);
         if (!this.scrapingIndex || this.scrapingIndex.device_id===""){
-            const currentDate = new Date();
+            let currentDate = new Date();
+            if (this.config.newspaper ==="abc"){
+                const dateOffset = (24*60*60*1000) * 30;
+                currentDate.setTime(currentDate - dateOffset)
+            }
             console.log("setting default index");
             this.scrapingIndex = {date_scraping :currentDate, date_last_new: currentDate, scraper_id: this.config.scraper_id, device_id: this.config.device_id, newspaper: this.config.newspaper}
         } else {
