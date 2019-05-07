@@ -37,16 +37,20 @@ module.exports = class ScraperApp {
         while (continueScraping) {
             this.updateDate();
             console.log("extracting all headlines and urls")
-            const scrapedNews = await this.historicScaper.scrapDate(this.scrapingIndex.date_last_new);
-            if (scrapedNews){
-                await scrapedNews.forEach(async (scrapedNew) => {
-                    await this.api.saveNew(scrapedNew);
-                });
+            try{
+                const scrapedNews = await this.historicScaper.scrapDate(this.scrapingIndex.date_last_new);
+                if (scrapedNews){
+                    await scrapedNews.forEach(async (scrapedNew) => {
+                        await this.api.saveNew(scrapedNew);
+                    });
+                }
+                this.scrapingIndex.date_scraped = new Date(Date.now());
+                this.scrapingIndex.last_historic_url = get(scrapedNews,'[0].urlHistoric');
+                await this.saveCurrentScrapingIndex();
+            } catch (err) {
+                console.log(err);
+                await this.saveCurrentScrapingIndex();
             }
-            this.scrapingIndex.date_scraped = new Date(Date.now());
-            this.scrapingIndex.last_historic_url = get(scrapedNews,'[0].urlHistoric');
-            await this.saveCurrentScrapingIndex();
-
             scrapedCount = scrapedCount + 1;
             continueScraping = scrapedCount < this.maxDaysToScrap;
         }
