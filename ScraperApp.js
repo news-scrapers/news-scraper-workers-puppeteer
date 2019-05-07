@@ -38,7 +38,7 @@ module.exports = class ScraperApp {
             this.updateDate();
             console.log("extracting all headlines and urls")
             try{
-                const scrapedNews = await this.historicScaper.scrapDate(this.scrapingIndex.date_last_new);
+                const scrapedNews = await this.historicScaper.scrapDate(this.scrapingIndex.date_last_new, this.scrapingIndex);
                 if (scrapedNews){
                     await scrapedNews.forEach(async (scrapedNew) => {
                         await this.api.saveNew(scrapedNew);

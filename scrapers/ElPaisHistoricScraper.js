@@ -1,5 +1,6 @@
 const PuppeteerScraper = require('./PuppeteerScraper');
 const htmlToText = require('html-to-text');
+const ScraperDataAccess = require("../ScraperDataAccess");
 
 module.exports = class ElPaisHistoricScraper extends PuppeteerScraper {
     constructor(configPath= "../config/scrapingConfig.json") {
@@ -7,19 +8,22 @@ module.exports = class ElPaisHistoricScraper extends PuppeteerScraper {
         this.timeWaitStart = 1 * 1000;
         this.timeWaitClick = 500;
         this.newsCounter = 0;
+        this.api = new ScraperDataAccess();
+
     }
 
-    async scrapDate(date) {
+    async scrapDate(date, scrapingIndex) {
         this.date = date;
-        this.page = 0;
         //https://elpais.com/tag/fecha/20190305/3
         const dateFormated = this.formatDate(date);
         await this.initializePuppeteer();
         let results = [];
-        let morePages = true;
+        const currentPage = scrapingIndex.page || 0;
         try {
-            while (morePages){
-                const pageResults = await this.scrapPage(dateFormated);
+            for (let page =currentPage ; page<=10; page++){
+                const pageResults = await this.scrapPage(dateFormated, page);
+                scrapingIndex.page = page;
+                await this.saveCurrentScrapingIndex(scrapingIndex);
                 for (let result of pageResults){
                    const url = result.url;
                        if (this.isNewUrl(url)) {
@@ -28,9 +32,9 @@ module.exports = class ElPaisHistoricScraper extends PuppeteerScraper {
                            results.push(...pageResults)
                        }
                 }
-                morePages = await this.existsMorePages();
-                this.page = this.page + 1;
             }
+            scrapingIndex.page = 0;
+            await this.saveCurrentScrapingIndex(scrapingIndex);
             await this.browser.close();
             return results;
         } catch (err) {
@@ -45,13 +49,13 @@ module.exports = class ElPaisHistoricScraper extends PuppeteerScraper {
         return url.indexOf(".htm") > -1
     }
 
-    async scrapPage(dateFormated){
+    async scrapPage(dateFormated, page){
         let results = [];
-        this.urlHistoric = "https://elpais.com/tag/fecha/" + dateFormated + "/" + this.page;
+        this.urlHistoric = "https://elpais.com/tag/fecha/" + dateFormated + "/" + page;
 
         console.log("\n-------");
         console.log("extracting data for date:" + dateFormated + " in url:");
-        console.log("-- page" + this.page + " --")
+        console.log("-- page" + page + " --")
         console.log(this.urlHistoric);
         console.log("-------");
         try {
@@ -68,18 +72,6 @@ module.exports = class ElPaisHistoricScraper extends PuppeteerScraper {
             //throw err;
         }
         return results;
-    }
-
-    async existsMorePages(){
-        try {
-            return this.page<10
-            //const button = await this.pageHistoric.$('li.paginacion-anterior');
-            //return (button !==undefined && button !==null);
-        } catch (err) {
-            console.log(err);
-            //throw err;
-        }
-
     }
     //didomi-dismiss-button
     formatDate(date){
@@ -146,5 +138,12 @@ module.exports = class ElPaisHistoricScraper extends PuppeteerScraper {
             console.log(e);
             return ""
         }
+    }
+
+    async saveCurrentScrapingIndex(scrapingIndex){
+        console.log("saving index ");
+        scrapingIndex.date_scraping = new Date();
+        console.log(scrapingIndex);
+        await this.api.saveScrapingIndex(scrapingIndex);
     }
 }
