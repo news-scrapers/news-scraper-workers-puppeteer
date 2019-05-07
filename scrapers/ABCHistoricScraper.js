@@ -40,18 +40,24 @@ module.exports = class ElPaisHistoricScraper extends PuppeteerScraper {
         console.log("extracting data for date: " + dateFormated + " in url:");
         console.log(url);
         console.log("-------");
-        await this.pageHistoric.goto(url, { waitUntil: 'networkidle2' });
+        try {
+            await this.pageHistoric.goto(url, { waitUntil: 'networkidle2' });
 
-        //lista-resultados
-        const div = await this.pageHistoric.$('div#lista-resultados');
-        const content = await this.extractContentFromDiv(div);
+            //lista-resultados
+            const div = await this.pageHistoric.$('div#lista-resultados');
+            const content = await this.extractContentFromDiv(div);
 
-        const urlHistoric = this.urlHistoric;
-        const scraper_id = this.config.scraper_id;
-        const newspaper = this.config.newspaper;
-        const date = this.date;
-        const id = this.generateId(date);
-        return {url, content, urlHistoric, scraper_id, newspaper, date, page, full_page:true, id};
+            const urlHistoric = this.urlHistoric;
+            const scraper_id = this.config.scraper_id;
+            const newspaper = this.config.newspaper;
+            const date = this.date;
+            const id = this.generateId(date);
+            await this.reopenBrowser();
+            return {url, content, urlHistoric, scraper_id, newspaper, date, page, full_page:true, id};
+        } catch (err) {
+            console.log(err);
+        }
+
     }
 
     formatDate(date){
