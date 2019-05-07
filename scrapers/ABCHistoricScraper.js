@@ -1,5 +1,6 @@
 const PuppeteerScraper = require('./PuppeteerScraper');
 const htmlToText = require('html-to-text');
+const ScraperDataAccess = require("../ScraperDataAccess");
 
 module.exports = class ElPaisHistoricScraper extends PuppeteerScraper {
     constructor(configPath= "../config/scrapingConfig.json") {
@@ -7,24 +8,32 @@ module.exports = class ElPaisHistoricScraper extends PuppeteerScraper {
         this.timeWaitStart = 1 * 1000;
         this.timeWaitClick = 500;
         this.maxPages = 81
+        this.api = new ScraperDataAccess();
+
     }
 
     //http://hemeroteca.abc.es/nav/Navigate.exe/hemeroteca/madrid/abc/2019/04/10/003.html
-    async scrapDate(date) {
+    async scrapDate(date, scrapingIndex) {
         this.date = date;
         //https://elpais.com/tag/fecha/20190305/3
         const dateFormated = this.formatDate(date);
         await this.initializePuppeteer();
         try {
             let scrapedPages = [];
-            for (let page =1; page<=this.maxPages; page++) {
+            const currentPage = scrapingIndex.page || 0;
+
+            for (let page =currentPage; page<=this.maxPages; page++) {
                 let scrapedPage = await this.scrapPage(dateFormated, page);
+                scrapingIndex.page = page;
+                await this.saveCurrentScrapingIndex(scrapingIndex);
                 if (scrapedPage && scrapedPage.content) scrapedPages.push(scrapedPage);
             }
-            return scrapedPages;
+            scrapingIndex.page = 0;
+            await this.saveCurrentScrapingIndex(scrapingIndex);
+
             await this.browser.close();
             await this.pageHistoric.waitFor(this.timeWaitStart);
-            return results;
+            return scrapedPages;
         } catch (err) {
             console.log(err);
             await this.pageHistoric.screenshot({ path: 'example.png' });
@@ -83,5 +92,12 @@ module.exports = class ElPaisHistoricScraper extends PuppeteerScraper {
             console.log(e);
             return ""
         }
+    }
+
+    async saveCurrentScrapingIndex(scrapingIndex){
+        console.log("saving index ");
+        scrapingIndex.date_scraping = new Date();
+        console.log(scrapingIndex);
+        await this.api.saveScrapingIndex(scrapingIndex);
     }
 }
