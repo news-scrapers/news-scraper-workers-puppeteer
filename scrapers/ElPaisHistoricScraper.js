@@ -16,23 +16,30 @@ module.exports = class ElPaisHistoricScraper extends PuppeteerScraper {
         await this.initializePuppeteer();
         let results = [];
         const currentPage = scrapingIndex.page || 0;
+        const currentUrlIndex = scrapingIndex.url_index || 1;
         try {
             for (let page =currentPage ; page<=10; page++){
                 const pageResults = await this.scrapPage(dateFormated, page);
                 scrapingIndex.page = page;
                 await this.saveCurrentScrapingIndex(scrapingIndex);
-                for (let result of pageResults){
-                   const url = result.url;
+                console.log("extracting content starting with " +currentUrlIndex + " of " + pageResults.length);
+                for (let urlIndex =currentUrlIndex ; urlIndex<=pageResults.length; urlIndex++){
+                   const result = pageResults[urlIndex];
+                   if (result){
+                       const url = result.url;
                        if (this.isNewUrl(url)) {
-                           const content = await this.extractContent(url);
+                           const content = await this.extractContent(url, urlIndex);
                            result.content = content;
+                           await this.savePartialResults([result])
+                           scrapingIndex.url_index  = urlIndex;
+                           await this.saveCurrentScrapingIndex(scrapingIndex);
                        }
+                   }
                 }
-                await this.savePartialResults(pageResults);
+                scrapingIndex.url_index  = 1;
+                await this.saveCurrentScrapingIndex(scrapingIndex);
                 results.push(...pageResults)
             }
-            scrapingIndex.page = 0;
-            await this.saveCurrentScrapingIndex(scrapingIndex);
             await this.browser.close();
             return results;
         } catch (err) {
@@ -106,8 +113,8 @@ module.exports = class ElPaisHistoricScraper extends PuppeteerScraper {
         }
     }
 
-    async extractContent(url){
-        console.log("extracting content of ");
+    async extractContent(url, urlIndex){
+        console.log("extracting content of " + urlIndex);
         console.log(url);
         try{
             await this.pageHistoric.goto(url, {waitUntil: 'load', timeout: 0});

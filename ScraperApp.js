@@ -62,6 +62,7 @@ module.exports = class ScraperApp {
         dateToScrap.setTime(this.scrapingIndex.date_last_new - this.dateOffset);
         this.scrapingIndex.date_last_new = dateToScrap;
         this.scrapingIndex.page = 0;
+        this.scrapingIndex.url_index = 1;
         console.log("current_date" + this.scrapingIndex.date_last_new)
     }
     async getCurrentScrapingIndex(){
