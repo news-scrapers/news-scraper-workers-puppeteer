@@ -1,6 +1,5 @@
 const PuppeteerScraper = require('./PuppeteerScraper');
 const htmlToText = require('html-to-text');
-const ScraperDataAccess = require("../ScraperDataAccess");
 
 module.exports = class ElPaisHistoricScraper extends PuppeteerScraper {
     constructor(configPath= "../config/scrapingConfig.json") {
@@ -8,9 +7,6 @@ module.exports = class ElPaisHistoricScraper extends PuppeteerScraper {
         this.timeWaitStart = 1 * 1000;
         this.timeWaitClick = 500;
         this.newsCounter = 0;
-        this.api = new ScraperDataAccess();
-
-
     }
 
     async scrapDate(date, scrapingIndex) {
@@ -31,15 +27,22 @@ module.exports = class ElPaisHistoricScraper extends PuppeteerScraper {
         }
     }
 
-    async scrapPage(dateFormated){
+    async scrapPage(dateFormated, scrapingIndex){
         const results = await this.extractNewsWithoutContent(dateFormated);
-
-        for (const result of results) {
+        console.log("starting scraping process of " + results.length + " news . We will start with page " + scrapingIndex.page);
+        const currentPage = scrapingIndex.page || 0;
+        for (let page = currentPage; page<=results.length; page ++) {
+            const result = results[page];
             const url = result.url;
-            const content = await this.extractContent(url);
+            const content = await this.extractContent(url, page);
             result.content = content;
-        }
+            await this.savePartialResults([result]);
 
+            scrapingIndex.page = page;
+            await this.saveCurrentScrapingIndex(scrapingIndex);
+        }
+        scrapingIndex.page = 0;
+        await this.saveCurrentScrapingIndex(scrapingIndex);
         return results;
     }
 
@@ -105,9 +108,9 @@ module.exports = class ElPaisHistoricScraper extends PuppeteerScraper {
             && url.indexOf("/index.html")===-1
     }
 
-    async extractContent(url){
+    async extractContent(url, page){
         console.log("---");
-        console.log("extracting content of ");
+        console.log("extracting content of " + page);
         console.log(url);
         try {
             await this.pageSingleNew.goto(url, {waitUntil: 'load', timeout: 0});

@@ -15,7 +15,8 @@ describe('App', function () {
         const scraper = new laVanguardiaHistoricScraper();
 
         it('scraping results shoud be not null', async function () {
-            const result = await scraper.scrapDate(date);
+            const scrapingIndex = {page:0};
+            const result = await scraper.scrapDate(date, scrapingIndex);
             console.log(result);
             assert(result[0] !== undefined);
             assert(result[0].content !== undefined);

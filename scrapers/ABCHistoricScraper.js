@@ -26,7 +26,10 @@ module.exports = class ElPaisHistoricScraper extends PuppeteerScraper {
                 let scrapedPage = await this.scrapPage(dateFormated, page);
                 scrapingIndex.page = page;
                 await this.saveCurrentScrapingIndex(scrapingIndex);
-                if (scrapedPage && scrapedPage.content) scrapedPages.push(scrapedPage);
+                if (scrapedPage && scrapedPage.content) {
+                    await this.savePartialResults([scrapedPage]);
+                    scrapedPages.push(scrapedPage);
+                }
             }
             scrapingIndex.page = 0;
             await this.saveCurrentScrapingIndex(scrapingIndex);
@@ -94,10 +97,4 @@ module.exports = class ElPaisHistoricScraper extends PuppeteerScraper {
         }
     }
 
-    async saveCurrentScrapingIndex(scrapingIndex){
-        console.log("saving index ");
-        scrapingIndex.date_scraping = new Date();
-        console.log(scrapingIndex);
-        await this.api.saveScrapingIndex(scrapingIndex);
-    }
 }

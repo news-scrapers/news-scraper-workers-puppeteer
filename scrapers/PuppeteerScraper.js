@@ -1,6 +1,7 @@
 const puppeteer = require('puppeteer');
 const randomUA = require('modern-random-ua');
 const uuidv1 = require('uuid/v1');
+const ScraperDataAccess = require("../ScraperDataAccess");
 
 
 module.exports = class PuppeteerScraper {
@@ -8,6 +9,7 @@ module.exports = class PuppeteerScraper {
         this.config = require(configPath);
         this.browser = null;
         this.pageHistoric = null;
+        this.api = new ScraperDataAccess();
 
         require('dotenv').config();
     }
@@ -58,5 +60,20 @@ module.exports = class PuppeteerScraper {
         let date = dateNews.toString().replace(new RegExp(" ", 'g'), "_").replace(new RegExp(":", 'g'), "_").replace(new RegExp(",", 'g'), "_").replace("+", "_");
         date = date.split("_GMT")[0];
         return this.config.scraper_id + "-" + date + "-" + uuidv1()
+    }
+
+
+    async savePartialResults(results){
+        console.log("saving partial results of " + results.length + "  news");
+        await results.forEach(async (scrapedNew) => {
+            await this.api.saveNew(scrapedNew);
+        });
+    }
+
+    async saveCurrentScrapingIndex(scrapingIndex){
+        console.log("saving index ");
+        scrapingIndex.date_scraping = new Date();
+        console.log(scrapingIndex);
+        await this.api.saveScrapingIndex(scrapingIndex);
     }
 }

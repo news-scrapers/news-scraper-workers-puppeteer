@@ -1,6 +1,5 @@
 const PuppeteerScraper = require('./PuppeteerScraper');
 const htmlToText = require('html-to-text');
-const ScraperDataAccess = require("../ScraperDataAccess");
 
 module.exports = class ElPaisHistoricScraper extends PuppeteerScraper {
     constructor(configPath= "../config/scrapingConfig.json") {
@@ -9,8 +8,6 @@ module.exports = class ElPaisHistoricScraper extends PuppeteerScraper {
         this.timeWaitStart = 1 * 1000;
         this.timeWaitClick = 500;
         this.newsCounter = 0;
-        this.api = new ScraperDataAccess();
-
     }
 
     async scrapDate(date, scrapingIndex) {
@@ -20,6 +17,7 @@ module.exports = class ElPaisHistoricScraper extends PuppeteerScraper {
         await this.initializePuppeteer();
         let results = [];
         try {
+            if (scrapingIndex.page ===0 ) scrapingIndex.page = 1;
             const currentPage = scrapingIndex.page || 1;
             for (let page =currentPage; page<=6; page++){
                 const urls = await this.extractNewsPagesUrls(dateFormated, page);
@@ -30,7 +28,7 @@ module.exports = class ElPaisHistoricScraper extends PuppeteerScraper {
                    const result = await this.extractFullPageNews(urls[index], index+1);
                    pageResults.push(result)
                 }
-
+                await this.savePartialResults(pageResults);
                 results.push(...pageResults)
             }
             scrapingIndex.page = 0;
@@ -116,12 +114,5 @@ module.exports = class ElPaisHistoricScraper extends PuppeteerScraper {
             console.log(e);
             return ""
         }
-    }
-
-    async saveCurrentScrapingIndex(scrapingIndex){
-        console.log("saving index ");
-        scrapingIndex.date_scraping = new Date();
-        console.log(scrapingIndex);
-        await this.api.saveScrapingIndex(scrapingIndex);
     }
 }

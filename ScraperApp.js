@@ -24,7 +24,7 @@ module.exports = class ScraperApp {
         } else if (this.config.newspaper === "lavanguardia"){
             this.historicScaper = new LaVanguardiaHistoricScraper();
         }
-        this.maxDaysToScrap = 1000;
+        this.maxDaysToScrap = 10000;
         this.dateOffset = (24*60*60*1000) * 1;
 
     }
@@ -35,7 +35,6 @@ module.exports = class ScraperApp {
         let scrapedCount = 0;
 
         while (continueScraping) {
-            this.updateDate();
             console.log("extracting all headlines and urls")
             try{
                 const scrapedNews = await this.historicScaper.scrapDate(this.scrapingIndex.date_last_new, this.scrapingIndex);
@@ -53,6 +52,7 @@ module.exports = class ScraperApp {
             }
             scrapedCount = scrapedCount + 1;
             continueScraping = scrapedCount < this.maxDaysToScrap;
+            this.updateDate();
         }
     }
 
@@ -61,6 +61,7 @@ module.exports = class ScraperApp {
         let dateToScrap = this.scrapingIndex.date_last_new;
         dateToScrap.setTime(this.scrapingIndex.date_last_new - this.dateOffset);
         this.scrapingIndex.date_last_new = dateToScrap;
+        this.scrapingIndex.page = 0;
         console.log("current_date" + this.scrapingIndex.date_last_new)
     }
     async getCurrentScrapingIndex(){
