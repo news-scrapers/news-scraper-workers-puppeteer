@@ -19,13 +19,15 @@ module.exports = class ElPaisHistoricScraper extends PuppeteerScraper {
         try {
             if (scrapingIndex.page ===0 ) scrapingIndex.page = 1;
             const currentPage = scrapingIndex.page || 1;
+            const currentUrlIndex = scrapingIndex.url_index || 0;
             for (let page =currentPage; page<=6; page++){
                 const urls = await this.extractNewsPagesUrls(dateFormated, page);
                 scrapingIndex.page = page;
                 await this.saveCurrentScrapingIndex(scrapingIndex);
                 const pageResults = [];
-                for (let index =0; index<urls.length; index++){
-                   const result = await this.extractFullPageNews(urls[index], index+1);
+                for (let urlIndex =currentUrlIndex ; urlIndex<=pageResults.length; urlIndex++){
+                   const result = await this.extractFullPageNews(urls[urlIndex], urlIndex+1);
+                    await this.savePartialResults([result]);
                    pageResults.push(result)
                 }
                 await this.savePartialResults(pageResults);
@@ -45,7 +47,7 @@ module.exports = class ElPaisHistoricScraper extends PuppeteerScraper {
     }
 
     async extractNewsPagesUrls(dateFormated, page){
-        let results = [];
+        let urls = [];
         this.urlHistoric = "http://hemeroteca.lavanguardia.com/edition.html?" + dateFormated + "&ed=&em=&ey=?page=" + page;
 
         console.log("\n-------");
@@ -59,13 +61,13 @@ module.exports = class ElPaisHistoricScraper extends PuppeteerScraper {
             const links = await this.pageHistoric.$$('a.portada');
             for (const link of links){
                 const url = await (await link.getProperty('href')).jsonValue();
-                results.push(url);
+                urls.push(url);
             }
         } catch (err) {
             console.log(err);
         }
         await this.reopenBrowser()
-        return results;
+        return urls;
     }
 
     //bd=31&bm=12&by=2018
@@ -81,26 +83,29 @@ module.exports = class ElPaisHistoricScraper extends PuppeteerScraper {
     }
 
     async extractFullPageNews(url, page){
-        console.log("extracting content of ");
-        console.log(url);
-        await this.pageHistoric.goto(url, {waitUntil: 'load', timeout: 0});
-        await this.pageHistoric.waitFor(this.timeWaitStart);
+        if (url) {
+            console.log("extracting content of url index " + page + " url:");
+            console.log(url);
+            await this.pageHistoric.goto(url, {waitUntil: 'load', timeout: 0});
+            await this.pageHistoric.waitFor(this.timeWaitStart);
 
-        //await page.$eval( 'a#topbar-search', form => form.click() );
-        const ocr = await this.pageHistoric.$('h3.text');
-        const content = await this.extractContentFromDiv(ocr);
+            //await page.$eval( 'a#topbar-search', form => form.click() );
+            const ocr = await this.pageHistoric.$('h3.text');
+            const content = await this.extractContentFromDiv(ocr);
 
-        this.newsCounter = this. newsCounter+1;
-        if (this.newsCounter > 4 ){
-            await this.reopenBrowser();
-            this.newsCounter = 0;
+            this.newsCounter = this. newsCounter+1;
+            if (this.newsCounter > 4 ){
+                await this.reopenBrowser();
+                this.newsCounter = 0;
+            }
+            const urlHistoric = this.urlHistoric;
+            const scraper_id = this.config.scraper_id;
+            const newspaper = this.config.newspaper;
+            const date = this.date;
+            const id = this.generateId(date);
+            return {url, urlHistoric, scraper_id, newspaper, date, content, page, full_page:true, id};
         }
-        const urlHistoric = this.urlHistoric;
-        const scraper_id = this.config.scraper_id;
-        const newspaper = this.config.newspaper;
-        const date = this.date;
-        const id = this.generateId(date);
-        return {url, urlHistoric, scraper_id, newspaper, date, content, page, full_page:true, id};
+
     }
 
     async extractContentFromDiv(div){

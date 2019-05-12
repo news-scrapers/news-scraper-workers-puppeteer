@@ -16,7 +16,7 @@ module.exports = class ElPaisHistoricScraper extends PuppeteerScraper {
         await this.initializePuppeteer();
         let results = [];
         const currentPage = scrapingIndex.page || 0;
-        const currentUrlIndex = scrapingIndex.url_index || 1;
+        const currentUrlIndex = scrapingIndex.url_index || 0;
         try {
             for (let page =currentPage ; page<=10; page++){
                 const pageResults = await this.scrapPage(dateFormated, page);
