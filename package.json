@@ -1,11 +1,12 @@
 {
-  "name": "el-pais-scraper",
+  "name": "opinions-review-scraper",
   "version": "1.0.0",
-  "description": "el-pais-scraper",
+  "description": "opinions-review-scraper",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "test": "mocha"
+    "start": "node lib/index.js",
+    "test": "mocha",
+    "build": "tsc"
   },
   "repository": {
     "type": "git",
@@ -18,15 +19,31 @@
   },
   "homepage": "https://github.com/news-scrapers/el-pais-scraper#readme",
   "dependencies": {
+    "@types/html-to-text": "^1.4.31",
+    "@types/jest": "^25.1.5",
+    "@types/mongoose": "^5.7.8",
+    "@types/node": "^13.11.0",
+    "@types/puppeteer": "^2.0.1",
+    "@types/user-agents": "^1.0.0",
+    "@types/uuid": "^7.0.2",
     "axios": "^0.18.0",
     "chai": "^4.2.0",
     "dotenv": "^7.0.0",
     "html-to-text": "^5.1.1",
+    "jest": "^24.9.0",
     "lodash": "^4.17.11",
-    "mocha": "^6.1.4",
     "modern-random-ua": "^1.0.3",
     "mongodb": "^3.2.3",
-    "puppeteer": "1.10.0",
+    "mongoose": "^5.9.7",
+    "puppeteer": "^2.1.1",
+    "puppeteer-extra": "^3.1.9",
+    "puppeteer-extra-plugin-stealth": "^2.4.9",
+    "ts-jest": "^24.1.0",
+    "ts-node": "^8.4.1",
+    "user-agents": "^1.0.559",
     "uuid": "^3.3.2"
+  },
+  "devDependencies": {
+    "typescript": "^3.8.3"
   }
 }

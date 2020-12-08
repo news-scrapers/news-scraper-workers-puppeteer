@@ -1,15 +1,16 @@
-const PuppeteerScraper = require('./PuppeteerScraper');
-const htmlToText = require('html-to-text');
+import  {PuppeteerScraper} from './PuppeteerScraper'
+import htmlToText from 'html-to-text'
 
-module.exports = class ElPaisNewContentScraper extends PuppeteerScraper {
-    constructor(configPath= "../config/scrapingConfig.json", page) {
+export class ElPaisNewContentScraper extends PuppeteerScraper {
+    public timeWaitStart: number
+    public timeWaitClick: number
+    constructor(configPath= "../config/scrapingConfig.json") {
         super(configPath);
-        this.page = page
         this.timeWaitStart = 1 * 1000;
         this.timeWaitClick = 500;
     }
 
-    async extractFullNew(url) {
+    async extractReviewsInUrl(url: string) {
         // https://elpais.com/economia/2019/03/01/actualidad/1551457314_646821.html
         console.log("\n---");
         console.log("extracting full new in url:")
@@ -40,14 +41,14 @@ module.exports = class ElPaisNewContentScraper extends PuppeteerScraper {
         }
     }
 
-    async extractBody(div){
+    async extractBody(div: any){
         const html =  await (await div.getProperty('innerHTML')).jsonValue();
         const text = htmlToText.fromString(html, {
             wordwrap: 130
         });
         return text
     }
-    async extractHeadline(div){
+    async extractHeadline(div: any){
         const h1Headline = await div.$('h1');
         const headline = await (await h1Headline.getProperty('textContent')).jsonValue();
         return headline
