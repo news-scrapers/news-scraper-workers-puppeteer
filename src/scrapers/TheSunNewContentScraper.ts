@@ -42,8 +42,8 @@ export class TheSunNewContentScraper extends PuppeteerScraper {
     }
 
     async clickOkButtonCookie () {
-
-            await this.page.click('button[title="Fine By Me!"]');
+        const frame = this.page.frames()
+            await frame[2].click('button[title="Fine By Me!"]');
 
     }
 
