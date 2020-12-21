@@ -57,6 +57,16 @@ export class PuppeteerScraper {
         await this.initializePuppeteer()
     }
 
+    async clickOkButtonCookie () {
+        try {
+            const frame = this.page.frames()
+            //frame[2].click('button[title="Fine By Me!"]');
+        } catch (e) {
+
+        }
+
+
+    }
 
 
     async savePartialResults(results:any){

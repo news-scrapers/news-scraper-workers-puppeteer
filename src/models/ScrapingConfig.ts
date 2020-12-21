@@ -6,8 +6,8 @@ export type ScrapingConfigDocument = mongoose.Document & ScrapingConfigI
 
 const scrapingConfigSchema = new mongoose.Schema({
     urlBase: String,
-    scraper_id: String,
-    app_id: String,
+    scraperId: String,
+    appId: String,
     newspaper:String
 }, { timestamps: true });
 
@@ -15,8 +15,8 @@ const scrapingConfigSchema = new mongoose.Schema({
 
 export interface ScrapingConfigI{
     urlBase: string;
-    scraper_id: string;
-    app_id: string;
+    scraperId: string;
+    appId: string;
     newspaper:string;
 }
 

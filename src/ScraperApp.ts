@@ -8,13 +8,13 @@ const fs = require("fs");
 
 export default class ScraperApp {
     public config: any;
-    public scraper: any;
+    public scrapers: Scra;
     public scrapingIndex: ScrapingIndexDocument;
     constructor() {
         require('dotenv').config();
         //this.api = new ScraperDataAccess();
 
-        if (this.config.newspaper === "elpais"){
+        if (this.config.newspaper === "thesun"){
             this.scraper = new ElPaisNewContentScraper();
         }
         

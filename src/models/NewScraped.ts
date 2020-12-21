@@ -6,12 +6,13 @@ export type NewScrapedDocument = mongoose.Document & NewScrapedI
 
 const newScrapedSchema = new mongoose.Schema({
     source: String,
-    date: String,
+    date: Date,
+    scrapedAt: Date,
     content: String,
     headline: String,
     tags: Array(String),
     url: String,
-    scraper_id: String,
+    scraperId: String,
     id: String
 }, { timestamps: true });
 
@@ -20,12 +21,13 @@ const newScrapedSchema = new mongoose.Schema({
 
 export interface NewScrapedI {
     source: string
-    date: string
+    date: Date
+    scrapedAt: Date
     content: string
     headline: string
     tags: string[]
     url: string
-    scraper_id: string
+    scraperId: string
     id: string
 }
 

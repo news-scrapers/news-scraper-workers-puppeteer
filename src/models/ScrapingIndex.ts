@@ -7,23 +7,23 @@ export type ScrapingIndexDocument = mongoose.Document & ScrapingIndexI
 
 const scrapingIndexSchema = new mongoose.Schema({
     date_scraping: Date,
-    url_index: Number,
-    page_index: Number,
-    reviews_source: String,
+    urlIndex: Number,
+    pageIndex: Number,
+    reviewsSource: String,
     startingUrls: Array(String),
-    scraper_id: String,
-    device_id: String
+    scraperId: String,
+    deviceId: String
 }, { timestamps: true });
 
 
 export interface ScrapingIndexI {
-    date_scraping: Date;
-    url_index: number;
-    page_index: number;
-    reviews_source: string;
+    dateScraping: Date;
+    urlIndex: number;
+    pageIndex: number;
+    reviewsSource: string;
     startingUrls: string[];
-    scraper_id: string;
-    device_id: string;
+    scraperId: string;
+    deviceId: string;
 }
 
 
