@@ -113,6 +113,7 @@ class ScraperApp {
         return __awaiter(this, void 0, void 0, function* () {
             scraperTuple.indexScraper.scrapingIndex.urlIndex = scraperTuple.indexScraper.scrapingIndex.urlIndex + 1;
             scraperTuple.indexScraper.scrapingIndex.pageNewIndex = 1;
+            scraperTuple.indexScraper.scrapingIndex.pageIndexSection = 1;
             if (scraperTuple.indexScraper.scrapingIndex.urlIndex > scraperTuple.indexScraper.scrapingIndex.startingUrls.length - 1) {
                 scraperTuple.indexScraper.scrapingIndex.urlIndex = 0;
             }

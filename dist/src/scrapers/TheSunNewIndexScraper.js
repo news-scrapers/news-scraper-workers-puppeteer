@@ -22,7 +22,6 @@ class TheSunNewIndexScraper extends IndexScraper_1.IndexScraper {
     }
     extractNewsUrlsInSectionPageFromIndexOneIteration() {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log(this.scrapingIndex.urlIndex, this.scrapingIndex.pageNewIndex);
             if (this.scrapingIndex.urlIndex >= this.scrapingIndex.startingUrls.length - 1) {
                 this.scrapingIndex.urlIndex = 0;
                 this.scrapingIndex.pageNewIndex = 1;
@@ -30,7 +29,6 @@ class TheSunNewIndexScraper extends IndexScraper_1.IndexScraper {
             }
             const currentUrl = this.scrapingIndex.startingUrls[this.scrapingIndex.urlIndex];
             const extractedUrls = yield this.extractUrlsFromStartingUrl(currentUrl);
-            console.log(currentUrl, extractedUrls, this.scrapingIndex.urlIndex, this.scrapingIndex.pageNewIndex);
             return extractedUrls;
         });
     }
