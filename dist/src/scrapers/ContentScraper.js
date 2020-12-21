@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ContentScraper = void 0;
 const PuppeteerScraper_1 = require("./PuppeteerScraper");
 class ContentScraper extends PuppeteerScraper_1.PuppeteerScraper {
-    extractNewInUrl(url) {
+    extractNewInUrl(url, scraperId) {
         return __awaiter(this, void 0, void 0, function* () {
             return {};
         });

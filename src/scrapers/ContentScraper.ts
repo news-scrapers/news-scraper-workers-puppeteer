@@ -4,9 +4,8 @@ import {NewScrapedI} from "../models/NewScraped";
 import {ScrapingIndexI} from "../models/ScrapingIndex";
 
 export class ContentScraper extends PuppeteerScraper {
-    public scrapingIndex: ScrapingIndexI
 
-    async extractNewInUrl(url: string):Promise<NewScrapedI> {
+    async extractNewInUrl(url: string, scraperId: string):Promise<NewScrapedI> {
         return {} as NewScrapedI
     }
 }

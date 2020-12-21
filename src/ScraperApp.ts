@@ -15,7 +15,7 @@ mongoose.connect(process.env["MONGODB_URL"], {useNewUrlParser: true, useUnifiedT
 
 export interface ScraperTuple {
     pageScraper: ContentScraper;
-    indexScraper: IndexScraper;
+    urlSectionExtractorScraper: IndexScraper;
 }
 
 export default class ScraperApp {
@@ -43,8 +43,8 @@ export default class ScraperApp {
                 await this.updateIndex(indexScraper)
 
                 const scraper = {
-                    pageScraper: new TheSunNewContentScraper(indexScraper),
-                    indexScraper: new TheSunNewIndexScraper(indexScraper)
+                    pageScraper: new TheSunNewContentScraper(),
+                    urlSectionExtractorScraper: new TheSunNewIndexScraper(indexScraper)
                 } as ScraperTuple
                 this.scrapers.push(scraper)
             }
@@ -89,32 +89,32 @@ export default class ScraperApp {
         let scrapedCount = 0;
 
         while (continueScraping) for (let scraperTuple of this.scrapers) {
-            const urls = await scraperTuple.indexScraper.extractNewsUrlsInSectionPageFromIndexOneIteration()
+            const urls = await scraperTuple.urlSectionExtractorScraper.extractNewsUrlsInSectionPageFromIndexOneIteration()
             console.log("starting scraping urls ")
             console.log(urls)
 
-            if (scraperTuple.indexScraper.scrapingIndex.pageNewIndex > urls.length - 1) {
-                scraperTuple.indexScraper.scrapingIndex.pageNewIndex = 1
-                await this.updateIndex(scraperTuple.pageScraper.scrapingIndex)
+            if (scraperTuple.urlSectionExtractorScraper.scrapingIndex.pageNewIndex >= urls.length - 1) {
+                scraperTuple.urlSectionExtractorScraper.scrapingIndex.pageNewIndex = 1
+                await this.updateIndex(scraperTuple.urlSectionExtractorScraper.scrapingIndex)
             }
 
-            while (scraperTuple.indexScraper.scrapingIndex.pageNewIndex < urls.length - 1) {
-                scraperTuple.pageScraper.scrapingIndex = scraperTuple.indexScraper.scrapingIndex
+            while (scraperTuple.urlSectionExtractorScraper.scrapingIndex.pageNewIndex <= urls.length - 1) {
+                scraperTuple.urlSectionExtractorScraper.scrapingIndex = scraperTuple.urlSectionExtractorScraper.scrapingIndex
 
-                const url = urls[scraperTuple.indexScraper.scrapingIndex.pageNewIndex]
+                const url = urls[scraperTuple.urlSectionExtractorScraper.scrapingIndex.pageNewIndex]
                 if (url) {
                     console.log("*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-")
-                    console.log("scraping url " + "page: " + scraperTuple.pageScraper.scrapingIndex.pageNewIndex + " url number: " + scraperTuple.pageScraper.scrapingIndex.urlIndex)
+                    console.log("scraping url " + "page: " + scraperTuple.urlSectionExtractorScraper.scrapingIndex.pageNewIndex + " url number: " + scraperTuple.urlSectionExtractorScraper.scrapingIndex.urlIndex)
                     console.log(url)
                     console.log("*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-")
 
-                    let extractedNews = await scraperTuple.pageScraper.extractNewInUrl(url)
+                    let extractedNews = await scraperTuple.pageScraper.extractNewInUrl(url, scraperTuple.urlSectionExtractorScraper.scrapingIndex.scraperId)
                     await this.saveNewsScraped(extractedNews)
 
                 }
 
-                scraperTuple.pageScraper.scrapingIndex.pageNewIndex = scraperTuple.pageScraper.scrapingIndex.pageNewIndex + 1
-                await this.updateIndex(scraperTuple.pageScraper.scrapingIndex)
+                scraperTuple.urlSectionExtractorScraper.scrapingIndex.pageNewIndex = scraperTuple.urlSectionExtractorScraper.scrapingIndex.pageNewIndex + 1
+                await this.updateIndex(scraperTuple.urlSectionExtractorScraper.scrapingIndex)
 
             }
 
@@ -123,15 +123,15 @@ export default class ScraperApp {
     }
 
     async setUpNextIteration(scraperTuple: ScraperTuple) {
-        scraperTuple.indexScraper.scrapingIndex.urlIndex = scraperTuple.indexScraper.scrapingIndex.urlIndex +1
-        scraperTuple.indexScraper.scrapingIndex.pageNewIndex = 1
-        scraperTuple.indexScraper.scrapingIndex.pageIndexSection = 1
+        scraperTuple.urlSectionExtractorScraper.scrapingIndex.urlIndex = scraperTuple.urlSectionExtractorScraper.scrapingIndex.urlIndex +1
+        scraperTuple.urlSectionExtractorScraper.scrapingIndex.pageNewIndex = 1
+        scraperTuple.urlSectionExtractorScraper.scrapingIndex.pageIndexSection = 1
 
-        if (scraperTuple.indexScraper.scrapingIndex.urlIndex > scraperTuple.indexScraper.scrapingIndex.startingUrls.length -1 ){
-            scraperTuple.indexScraper.scrapingIndex.urlIndex = 0
+        if (scraperTuple.urlSectionExtractorScraper.scrapingIndex.urlIndex > scraperTuple.urlSectionExtractorScraper.scrapingIndex.startingUrls.length -1 ){
+            scraperTuple.urlSectionExtractorScraper.scrapingIndex.urlIndex = 0
         }
 
-        await this.updateIndex(scraperTuple.indexScraper.scrapingIndex)
+        await this.updateIndex(scraperTuple.urlSectionExtractorScraper.scrapingIndex)
     }
 
     async saveNewsScraped(newItem: NewScrapedI) {

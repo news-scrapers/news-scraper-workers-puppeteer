@@ -1,1 +1,1 @@
-{"version":3,"file":"ContentScraper.js","sourceRoot":"","sources":["../../../src/scrapers/ContentScraper.ts"],"names":[],"mappings":";;;;;;;;;;;;AACA,yDAAoD;AAIpD,MAAa,cAAe,SAAQ,mCAAgB;IAG1C,eAAe,CAAC,GAAW;;YAC7B,OAAO,EAAiB,CAAA;QAC5B,CAAC;KAAA;CACJ;AAND,wCAMC"}
+{"version":3,"file":"ContentScraper.js","sourceRoot":"","sources":["../../../src/scrapers/ContentScraper.ts"],"names":[],"mappings":";;;;;;;;;;;;AACA,yDAAoD;AAIpD,MAAa,cAAe,SAAQ,mCAAgB;IAE1C,eAAe,CAAC,GAAW,EAAE,SAAiB;;YAChD,OAAO,EAAiB,CAAA;QAC5B,CAAC;KAAA;CACJ;AALD,wCAKC"}

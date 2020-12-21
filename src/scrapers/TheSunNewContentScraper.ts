@@ -8,15 +8,13 @@ import {v4} from 'uuid'
 export class TheSunNewContentScraper extends ContentScraper {
     public timeWaitStart: number
     public timeWaitClick: number
-    public scrapingIndex: ScrapingIndexI
-    constructor(scrapingIndex: ScrapingIndexI, configPath= "../config/scrapingConfig.json") {
+    constructor(configPath= "../config/scrapingConfig.json") {
         super(configPath);
-        this.scrapingIndex = scrapingIndex
         this.timeWaitStart = 1 * 1000
         this.timeWaitClick = 500
     }
 
-    async extractNewInUrl(url: string):Promise<NewScrapedI> {
+    async extractNewInUrl(url: string, scraperId: string):Promise<NewScrapedI> {
         // https://www.thesun.co.uk/tvandshowbiz/13409249/mark-wright-found-car-stolen-essex/
         console.log("\n---");
         console.log("extracting full new in url:")
@@ -38,7 +36,7 @@ export class TheSunNewContentScraper extends ContentScraper {
             await this.browser.close();
             await this.page.waitFor(this.timeWaitStart);
 
-            let results = {id:v4(), url,headline, content, date,tags, scraperId : this.scrapingIndex.scraperId, scrapedAt:new Date()} as NewScrapedI
+            let results = {id:v4(), url,headline, content, date,tags, scraperId, scrapedAt:new Date()} as NewScrapedI
             return results;
 
         } catch (err) {

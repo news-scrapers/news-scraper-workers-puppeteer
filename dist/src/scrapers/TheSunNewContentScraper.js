@@ -13,16 +13,15 @@ exports.TheSunNewContentScraper = void 0;
 const ContentScraper_1 = require("./ContentScraper");
 const uuid_1 = require("uuid");
 class TheSunNewContentScraper extends ContentScraper_1.ContentScraper {
-    constructor(scrapingIndex, configPath = "../config/scrapingConfig.json") {
+    constructor(configPath = "../config/scrapingConfig.json") {
         super(configPath);
         this.cleanUp = (text) => {
             return text.replace(/\n/g, " ");
         };
-        this.scrapingIndex = scrapingIndex;
         this.timeWaitStart = 1 * 1000;
         this.timeWaitClick = 500;
     }
-    extractNewInUrl(url) {
+    extractNewInUrl(url, scraperId) {
         return __awaiter(this, void 0, void 0, function* () {
             // https://www.thesun.co.uk/tvandshowbiz/13409249/mark-wright-found-car-stolen-essex/
             console.log("\n---");
@@ -41,7 +40,7 @@ class TheSunNewContentScraper extends ContentScraper_1.ContentScraper {
                 const date = yield this.extractDate();
                 yield this.browser.close();
                 yield this.page.waitFor(this.timeWaitStart);
-                let results = { id: uuid_1.v4(), url, headline, content, date, tags, scraperId: this.scrapingIndex.scraperId, scrapedAt: new Date() };
+                let results = { id: uuid_1.v4(), url, headline, content, date, tags, scraperId, scrapedAt: new Date() };
                 return results;
             }
             catch (err) {

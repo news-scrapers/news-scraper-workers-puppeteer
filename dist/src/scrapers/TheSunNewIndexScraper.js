@@ -22,14 +22,15 @@ class TheSunNewIndexScraper extends IndexScraper_1.IndexScraper {
     }
     extractNewsUrlsInSectionPageFromIndexOneIteration() {
         return __awaiter(this, void 0, void 0, function* () {
-            if (this.scrapingIndex.urlIndex >= this.scrapingIndex.startingUrls.length - 1) {
+            if (this.scrapingIndex.urlIndex > this.scrapingIndex.startingUrls.length - 1) {
                 this.scrapingIndex.urlIndex = 0;
                 this.scrapingIndex.pageNewIndex = 1;
                 this.scrapingIndex.pageIndexSection = 1;
             }
             const currentUrl = this.scrapingIndex.startingUrls[this.scrapingIndex.urlIndex];
             const extractedUrls = yield this.extractUrlsFromStartingUrl(currentUrl);
-            return extractedUrls;
+            const uniqUrls = [...new Set(extractedUrls)];
+            return uniqUrls;
         });
     }
     extractUrlsFromStartingUrl(url) {
