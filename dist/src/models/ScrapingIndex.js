@@ -8,7 +8,8 @@ const mongoose_1 = __importDefault(require("mongoose"));
 const scrapingIndexSchema = new mongoose_1.default.Schema({
     date_scraping: Date,
     urlIndex: Number,
-    pageIndex: Number,
+    pageNewIndex: Number,
+    pageIndexSection: Number,
     maxPages: Number,
     newspaper: String,
     reviewsSource: String,

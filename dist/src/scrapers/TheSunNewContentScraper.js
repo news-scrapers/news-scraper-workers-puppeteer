@@ -61,8 +61,14 @@ class TheSunNewContentScraper extends ContentScraper_1.ContentScraper {
                 ignoreHref:true
             });
             */
-            const text = yield this.page.evaluate(element => element.textContent, div);
-            return text;
+            try {
+                const text = yield this.page.evaluate(element => element.textContent, div);
+                return text;
+            }
+            catch (e) {
+                console.log(e);
+                return null;
+            }
         });
     }
     extractDate() {
@@ -92,9 +98,14 @@ class TheSunNewContentScraper extends ContentScraper_1.ContentScraper {
     }
     extractHeadline(div) {
         return __awaiter(this, void 0, void 0, function* () {
-            const h1Headline = yield div.$('p.article__content--intro');
-            const headline = yield (yield h1Headline.getProperty('textContent')).jsonValue();
-            return headline;
+            try {
+                const h1Headline = yield div.$('p.article__content--intro');
+                const headline = yield (yield h1Headline.getProperty('textContent')).jsonValue();
+                return headline;
+            }
+            catch (e) {
+                return "";
+            }
         });
     }
 }

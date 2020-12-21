@@ -57,8 +57,14 @@ export class TheSunNewContentScraper extends ContentScraper {
             ignoreHref:true
         });
         */
-        const text = await this.page.evaluate(element => element.textContent, div);
-        return text
+        try{
+            const text = await this.page.evaluate(element => element.textContent, div);
+            return text
+        } catch (e){
+            console.log(e)
+            return null
+        }
+
     }
 
     cleanUp = (text: string) => {
@@ -87,8 +93,13 @@ export class TheSunNewContentScraper extends ContentScraper {
 
     }
     async extractHeadline(div: any) {
-        const h1Headline = await div.$('p.article__content--intro');
-        const headline = await (await h1Headline.getProperty('textContent')).jsonValue();
-        return headline
+        try{
+            const h1Headline = await div.$('p.article__content--intro');
+            const headline = await (await h1Headline.getProperty('textContent')).jsonValue();
+            return headline
+        } catch (e) {
+            return ""
+        }
+
     }
 }

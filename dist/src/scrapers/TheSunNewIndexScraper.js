@@ -22,35 +22,37 @@ class TheSunNewIndexScraper extends IndexScraper_1.IndexScraper {
     }
     extractNewsUrlsInSectionPageFromIndexOneIteration() {
         return __awaiter(this, void 0, void 0, function* () {
+            console.log(this.scrapingIndex.urlIndex, this.scrapingIndex.pageNewIndex);
+            if (this.scrapingIndex.urlIndex >= this.scrapingIndex.startingUrls.length - 1) {
+                this.scrapingIndex.urlIndex = 0;
+                this.scrapingIndex.pageNewIndex = 1;
+                this.scrapingIndex.pageIndexSection = 1;
+            }
             const currentUrl = this.scrapingIndex.startingUrls[this.scrapingIndex.urlIndex];
             const extractedUrls = yield this.extractUrlsFromStartingUrl(currentUrl);
-            this.scrapingIndex.urlIndex = this.scrapingIndex.urlIndex + 1;
-            this.scrapingIndex.pageIndex = 2;
-            if (this.scrapingIndex.urlIndex > this.scrapingIndex.startingUrls.length) {
-                this.scrapingIndex.urlIndex = 0;
-            }
+            console.log(currentUrl, extractedUrls, this.scrapingIndex.urlIndex, this.scrapingIndex.pageNewIndex);
             return extractedUrls;
         });
     }
     extractUrlsFromStartingUrl(url) {
         return __awaiter(this, void 0, void 0, function* () {
             //https://www.thesun.co.uk/tv
-            if (!this.scrapingIndex.pageIndex || this.scrapingIndex.pageIndex < 2) {
-                this.scrapingIndex.pageIndex = 2;
+            if (!this.scrapingIndex.pageIndexSection || this.scrapingIndex.pageIndexSection < 2) {
+                this.scrapingIndex.pageIndexSection = 2;
             }
-            while (this.scrapingIndex.pageIndex < this.maxPages) {
+            while (this.scrapingIndex.pageIndexSection <= this.maxPages - 1) {
                 try {
-                    const urls = yield this.extractUrlsInPage(url, this.scrapingIndex.pageIndex);
+                    const urls = yield this.extractUrlsInPage(url, this.scrapingIndex.pageIndexSection);
                     this.urls = this.urls.concat(urls);
-                    this.scrapingIndex.pageIndex = this.scrapingIndex.pageIndex + 1;
+                    this.scrapingIndex.pageIndexSection = this.scrapingIndex.pageIndexSection + 1;
                 }
                 catch (e) {
                     console.log(e);
-                    this.scrapingIndex.pageIndex = 2;
+                    this.scrapingIndex.pageIndexSection = 2;
                     return this.urls;
                 }
             }
-            this.scrapingIndex.pageIndex = 2;
+            this.scrapingIndex.pageIndexSection = 2;
             return this.urls;
         });
     }

@@ -75,7 +75,7 @@ export default class ScraperApp {
         const indexScraper = {} as ScrapingIndexI
         indexScraper.urlIndex = 0
         indexScraper.startingUrls = this.config.startingUrls[newspaper]
-        indexScraper.pageIndex = 1
+        indexScraper.pageNewIndex = 1
         indexScraper.newspaper = newspaper
         indexScraper.scraperId = this.config.scraperId
         indexScraper.deviceId = this.config.deviceId
@@ -88,30 +88,50 @@ export default class ScraperApp {
         let continueScraping = true;
         let scrapedCount = 0;
 
-        while (continueScraping) {
-            for (let scraperTuple of this.scrapers) {
-                const urls = await scraperTuple.indexScraper.extractNewsUrlsInSectionPageFromIndexOneIteration()
-                console.log("starting scraping urls ")
-                console.log(urls)
+        while (continueScraping) for (let scraperTuple of this.scrapers) {
+            const urls = await scraperTuple.indexScraper.extractNewsUrlsInSectionPageFromIndexOneIteration()
+            console.log("starting scraping urls ")
+            console.log(urls)
 
-                for (let page = scraperTuple.indexScraper.scrapingIndex.pageIndex; page++; page < urls.length - 1) {
-                    scraperTuple.pageScraper.scrapingIndex = scraperTuple.indexScraper.scrapingIndex
-                    const url = urls[page]
+            if (scraperTuple.indexScraper.scrapingIndex.pageNewIndex > urls.length - 1) {
+                scraperTuple.indexScraper.scrapingIndex.pageNewIndex = 1
+                await this.updateIndex(scraperTuple.pageScraper.scrapingIndex)
+            }
 
+            while (scraperTuple.indexScraper.scrapingIndex.pageNewIndex < urls.length - 1) {
+                scraperTuple.pageScraper.scrapingIndex = scraperTuple.indexScraper.scrapingIndex
+
+                const url = urls[scraperTuple.indexScraper.scrapingIndex.pageNewIndex]
+                if (url) {
                     console.log("*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-")
-                    console.log("scraping url")
+                    console.log("scraping url " + "page: " + scraperTuple.pageScraper.scrapingIndex.pageNewIndex + " url number: " + scraperTuple.pageScraper.scrapingIndex.urlIndex)
                     console.log(url)
                     console.log("*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-")
 
                     let extractedNews = await scraperTuple.pageScraper.extractNewInUrl(url)
                     await this.saveNewsScraped(extractedNews)
-                    await this.updateIndex(scraperTuple.pageScraper.scrapingIndex)
-                    console.log(extractedNews)
 
                 }
-                await this.updateIndex(scraperTuple.indexScraper.scrapingIndex)
+
+                scraperTuple.pageScraper.scrapingIndex.pageNewIndex = scraperTuple.pageScraper.scrapingIndex.pageNewIndex + 1
+                await this.updateIndex(scraperTuple.pageScraper.scrapingIndex)
+
             }
+
+            await this.setUpNextIteration(scraperTuple)
         }
+    }
+
+    async setUpNextIteration(scraperTuple: ScraperTuple) {
+        scraperTuple.indexScraper.scrapingIndex.urlIndex = scraperTuple.indexScraper.scrapingIndex.urlIndex +1
+        scraperTuple.indexScraper.scrapingIndex.pageNewIndex = 1
+        scraperTuple.indexScraper.scrapingIndex.pageIndexSection = 1
+
+        if (scraperTuple.indexScraper.scrapingIndex.urlIndex > scraperTuple.indexScraper.scrapingIndex.startingUrls.length -1 ){
+            scraperTuple.indexScraper.scrapingIndex.urlIndex = 0
+        }
+
+        await this.updateIndex(scraperTuple.indexScraper.scrapingIndex)
     }
 
     async saveNewsScraped(newItem: NewScrapedI) {

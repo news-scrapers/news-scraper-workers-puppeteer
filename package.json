@@ -4,8 +4,9 @@
   "description": "opinions-review-scraper",
   "main": "index.js",
   "scripts": {
-    "start": "node lib/index.js",
+    "start": "node dist/src/main.js",
     "test": "mocha",
+    "build": "tsc",
     "build": "tsc"
   },
   "repository": {

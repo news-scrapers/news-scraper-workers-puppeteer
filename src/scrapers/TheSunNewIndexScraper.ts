@@ -19,37 +19,38 @@ export class TheSunNewIndexScraper extends IndexScraper {
     }
 
     async extractNewsUrlsInSectionPageFromIndexOneIteration (): Promise<string[]> {
+
+        if (this.scrapingIndex.urlIndex >= this.scrapingIndex.startingUrls.length -1 ){
+            this.scrapingIndex.urlIndex = 0
+            this.scrapingIndex.pageNewIndex= 1
+            this.scrapingIndex.pageIndexSection = 1
+        }
         const currentUrl = this.scrapingIndex.startingUrls[this.scrapingIndex.urlIndex]
         const extractedUrls = await this.extractUrlsFromStartingUrl(currentUrl)
-        this.scrapingIndex.urlIndex = this.scrapingIndex.urlIndex + 1
-        this.scrapingIndex.pageIndex = 2
 
-        if (this.scrapingIndex.urlIndex > this.scrapingIndex.startingUrls.length){
-            this.scrapingIndex.urlIndex = 0
-        }
 
         return extractedUrls
     }
 
     async extractUrlsFromStartingUrl(url: string): Promise<string[]> {
         //https://www.thesun.co.uk/tv
-        if (!this.scrapingIndex.pageIndex || this.scrapingIndex.pageIndex<2) {
-            this.scrapingIndex.pageIndex = 2
+        if (!this.scrapingIndex.pageIndexSection || this.scrapingIndex.pageIndexSection<2) {
+            this.scrapingIndex.pageIndexSection = 2
         }
 
-        while (this.scrapingIndex.pageIndex < this.maxPages) {
+        while (this.scrapingIndex.pageIndexSection <= this.maxPages-1) {
             try {
-                const urls = await this.extractUrlsInPage(url,this.scrapingIndex.pageIndex)
+                const urls = await this.extractUrlsInPage(url,this.scrapingIndex.pageIndexSection)
                 this.urls = this.urls.concat(urls)
-                this.scrapingIndex.pageIndex = this.scrapingIndex.pageIndex + 1
+                this.scrapingIndex.pageIndexSection = this.scrapingIndex.pageIndexSection + 1
             } catch (e) {
                 console.log(e)
-                this.scrapingIndex.pageIndex =2
+                this.scrapingIndex.pageIndexSection =2
                 return this.urls
             }
         }
 
-        this.scrapingIndex.pageIndex =2
+        this.scrapingIndex.pageIndexSection =2
         return this.urls
     }
 

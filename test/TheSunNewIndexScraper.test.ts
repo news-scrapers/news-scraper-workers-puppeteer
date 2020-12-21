@@ -8,7 +8,7 @@ describe('the sun new scraper', function () {
     describe('test scraper in a for a given new', function () {
 
         const date = new Date()
-        const testIndex = {urlIndex:1, pageIndex:2, startingUrls:
+        const testIndex = {urlIndex:1, pageNewIndex:2, startingUrls:
                 ["https://www.thesun.co.uk/tech/",
                 "https://www.thesun.co.uk/travel/",
                 "https://www.thesun.co.uk/tv/"]
@@ -20,13 +20,13 @@ describe('the sun new scraper', function () {
 
 
         it('scraping results shoud be not using index', async function () {
-            testIndex.pageIndex = 2
+            testIndex.pageNewIndex = 2
             testIndex.urlIndex = 0
             const result = await scraper.extractNewsUrlsInSectionPageFromIndexOneIteration();
             console.log(result);
             console.log(scraper.scrapingIndex);
             expect(result).toBeDefined()
-            expect(scraper.scrapingIndex.pageIndex).toBe(2)
+            expect(scraper.scrapingIndex.pageNewIndex).toBe(2)
             expect(scraper.scrapingIndex.urlIndex).toBe(1)
         });
 
@@ -35,7 +35,7 @@ describe('the sun new scraper', function () {
             const result = await scraper.extractUrlsFromStartingUrl(url);
             console.log(result);
             expect(result).toBeDefined()
-            expect(scraper.scrapingIndex.pageIndex).toBeDefined()
+            expect(scraper.scrapingIndex.pageNewIndex).toBeDefined()
         });
     });
 });
