@@ -5,19 +5,24 @@ import mongoose from "mongoose";
 export type ScrapingConfigDocument = mongoose.Document & ScrapingConfigI
 
 const scrapingConfigSchema = new mongoose.Schema({
-    urlBase: String,
     scraperId: String,
     appId: String,
-    newspaper:String
+    maxPages: Number,
+    deviceId:String,
+    newspapers: Array(String),
+    startingUrls: Object
 }, { timestamps: true });
 
 
 
 export interface ScrapingConfigI{
-    urlBase: string;
     scraperId: string;
     appId: string;
-    newspaper:string;
+    maxPages: number;
+    deviceId:string;
+    newspapers:string[];
+    startingUrls: any;
+
 }
 
 export const ScrapingConfig = mongoose.model<ScrapingConfigDocument>("ScrapingConfig", scrapingConfigSchema);

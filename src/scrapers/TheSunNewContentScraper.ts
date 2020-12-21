@@ -2,8 +2,10 @@ import  {PuppeteerScraper} from './PuppeteerScraper'
 import htmlToText from 'html-to-text'
 import {NewScrapedI} from "../models/NewScraped";
 import {ScrapingIndexI} from "../models/ScrapingIndex";
+import {ContentScraper} from "./ContentScraper";
+import {v4} from 'uuid'
 
-export class TheSunNewContentScraper extends PuppeteerScraper {
+export class TheSunNewContentScraper extends ContentScraper {
     public timeWaitStart: number
     public timeWaitClick: number
     public scrapingIndex: ScrapingIndexI
@@ -14,7 +16,7 @@ export class TheSunNewContentScraper extends PuppeteerScraper {
         this.timeWaitClick = 500
     }
 
-    async extractReviewsInUrl(url: string):Promise<NewScrapedI> {
+    async extractNewInUrl(url: string):Promise<NewScrapedI> {
         // https://www.thesun.co.uk/tvandshowbiz/13409249/mark-wright-found-car-stolen-essex/
         console.log("\n---");
         console.log("extracting full new in url:")
@@ -36,7 +38,7 @@ export class TheSunNewContentScraper extends PuppeteerScraper {
             await this.browser.close();
             await this.page.waitFor(this.timeWaitStart);
 
-            let results = {url,headline, content, date,tags, scraperId : this.scrapingIndex.scraperId, scrapedAt:new Date()} as NewScrapedI
+            let results = {id:v4(), url,headline, content, date,tags, scraperId : this.scrapingIndex.scraperId, scrapedAt:new Date()} as NewScrapedI
             return results;
 
         } catch (err) {
@@ -64,15 +66,25 @@ export class TheSunNewContentScraper extends PuppeteerScraper {
     }
 
     async extractDate(): Promise<Date> {
-        const date = await this.page.$eval("head > meta[property='article:published_time']", (element:any) => element.content);
-        return new Date(date)
+        try {
+            const date = await this.page.$eval("head > meta[property='article:published_time']", (element:any) => element.content);
+            return new Date(date)
+        } catch (e) {
+            return null
+        }
+
     }
     async extractTags(): Promise<string[]> {
-        let tags = await this.page.$eval("head > meta[property='article:tag']", (element:any) => element.content);
-        if (tags && tags.includes(",")){
-            return tags.split(",").map((elem:string) => (elem.trim()))
+        try{
+            let tags = await this.page.$eval("head > meta[property='article:tag']", (element:any) => element.content);
+            if (tags && tags.includes(",")){
+                return tags.split(",").map((elem:string) => (elem.trim()))
+            }
+            return [tags]
+        } catch (e) {
+            return []
         }
-        return [tags]
+
     }
     async extractHeadline(div: any) {
         const h1Headline = await div.$('p.article__content--intro');

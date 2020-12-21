@@ -29,7 +29,7 @@ export class PuppeteerScraper {
         
         console.log("initializing puppeteer");
         this.browser = await puppeteer.use(StealthPlugin()).launch({
-            headless: false,
+            headless: true,
         });
         
         this.page = await this.browser.newPage();
@@ -43,7 +43,7 @@ export class PuppeteerScraper {
         }
 
         process.on("uncaughtException", () => {
-            handleClose(`I crashed`);
+            //handleClose(`I crashed`);
         });
 
         process.on("unhandledRejection", () => {

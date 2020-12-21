@@ -1,8 +1,9 @@
 import  {PuppeteerScraper} from './PuppeteerScraper'
 import htmlToText from 'html-to-text'
 import {ScrapingIndexI} from "../models/ScrapingIndex";
+import {IndexScraper} from "./IndexScraper";
 
-export class TheSunNewIndexScraper extends PuppeteerScraper {
+export class TheSunNewIndexScraper extends IndexScraper {
     public timeWaitStart: number
     public timeWaitClick: number
     public maxPages: number
@@ -14,7 +15,7 @@ export class TheSunNewIndexScraper extends PuppeteerScraper {
         this.scrapingIndex = scrapingIndex
         this.timeWaitStart = 1 * 1000;
         this.timeWaitClick = 500;
-        this.maxPages = 100
+        this.maxPages = scrapingIndex.maxPages
     }
 
     async extractNewsUrlsInSectionPageFromIndexOneIteration (): Promise<string[]> {

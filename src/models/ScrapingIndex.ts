@@ -9,6 +9,8 @@ const scrapingIndexSchema = new mongoose.Schema({
     date_scraping: Date,
     urlIndex: Number,
     pageIndex: Number,
+    maxPages: Number,
+    newspaper: String,
     reviewsSource: String,
     startingUrls: Array(String),
     scraperId: String,
@@ -20,6 +22,8 @@ export interface ScrapingIndexI {
     dateScraping: Date;
     urlIndex: number;
     pageIndex: number;
+    maxPages: number;
+    newspaper: string;
     reviewsSource: string;
     startingUrls: string[];
     scraperId: string;
@@ -27,5 +31,5 @@ export interface ScrapingIndexI {
 }
 
 
-export const ScrapingConfig = mongoose.model<ScrapingIndexDocument>("ScrapingIndex", scrapingIndexSchema);
+export const ScrapingIndex = mongoose.model<ScrapingIndexDocument>("ScrapingIndex", scrapingIndexSchema);
 

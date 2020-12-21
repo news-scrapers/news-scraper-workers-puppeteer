@@ -31,4 +31,4 @@ export interface NewScrapedI {
     id: string
 }
 
-export const ReviewScraped = mongoose.model<NewScrapedDocument>("NewScraped", newScrapedSchema);
+export const NewScraped = mongoose.model<NewScrapedDocument>("NewScraped", newScrapedSchema);

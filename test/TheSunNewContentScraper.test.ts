@@ -13,7 +13,7 @@ describe('the sun new scraper', function () {
         jest.setTimeout(59999)
         it('scraping results shoud be not null', async function () {
             const url ="https://www.thesun.co.uk/tv/13526075/strictly-jamie-laing-sister-giovanni-pernice-number/" // "https://www.thesun.co.uk/tvandshowbiz/13409249/mark-wright-found-car-stolen-essex/"
-            const result = await scraper.extractReviewsInUrl(url);
+            const result = await scraper.extractNewInUrl(url);
             console.log(result);
             expect(result).toHaveProperty("content")
             expect(result).toHaveProperty("date")
