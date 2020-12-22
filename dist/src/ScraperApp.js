@@ -47,6 +47,7 @@ class ScraperApp {
     }
     updateIndex(index) {
         return __awaiter(this, void 0, void 0, function* () {
+            index.dateScraping = new Date();
             const scrapingIndexDocument = yield ScrapingIndex_1.ScrapingIndex.findOneAndUpdate({
                 scraperId: index.scraperId,
                 newspaper: index.newspaper
@@ -84,29 +85,41 @@ class ScraperApp {
             let scrapedCount = 0;
             while (continueScraping)
                 for (let scraperTuple of this.scrapers) {
-                    const urls = yield scraperTuple.urlSectionExtractorScraper.extractNewsUrlsInSectionPageFromIndexOneIteration();
-                    console.log("starting scraping urls ");
-                    console.log(urls);
-                    if (scraperTuple.urlSectionExtractorScraper.scrapingIndex.pageNewIndex >= urls.length - 1) {
-                        scraperTuple.urlSectionExtractorScraper.scrapingIndex.pageNewIndex = 1;
-                        yield this.updateIndex(scraperTuple.urlSectionExtractorScraper.scrapingIndex);
+                    try {
+                        yield this.scrapOneIterationFromOneScraper(scraperTuple);
                     }
-                    while (scraperTuple.urlSectionExtractorScraper.scrapingIndex.pageNewIndex <= urls.length - 1) {
-                        scraperTuple.urlSectionExtractorScraper.scrapingIndex = scraperTuple.urlSectionExtractorScraper.scrapingIndex;
-                        const url = urls[scraperTuple.urlSectionExtractorScraper.scrapingIndex.pageNewIndex];
-                        if (url) {
-                            console.log("*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-");
-                            console.log("scraping url " + "page: " + scraperTuple.urlSectionExtractorScraper.scrapingIndex.pageNewIndex + " url number: " + scraperTuple.urlSectionExtractorScraper.scrapingIndex.urlIndex);
-                            console.log(url);
-                            console.log("*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-");
-                            let extractedNews = yield scraperTuple.pageScraper.extractNewInUrl(url, scraperTuple.urlSectionExtractorScraper.scrapingIndex.scraperId);
-                            yield this.saveNewsScraped(extractedNews);
-                        }
-                        scraperTuple.urlSectionExtractorScraper.scrapingIndex.pageNewIndex = scraperTuple.urlSectionExtractorScraper.scrapingIndex.pageNewIndex + 1;
-                        yield this.updateIndex(scraperTuple.urlSectionExtractorScraper.scrapingIndex);
+                    catch (e) {
+                        console.log("----------------------------------");
+                        console.log("ERROR");
+                        console.log("----------------------------------");
                     }
-                    yield this.setUpNextIteration(scraperTuple);
                 }
+        });
+    }
+    scrapOneIterationFromOneScraper(scraperTuple) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const urls = yield scraperTuple.urlSectionExtractorScraper.extractNewsUrlsInSectionPageFromIndexOneIteration();
+            console.log("starting scraping urls ");
+            console.log(urls);
+            if (scraperTuple.urlSectionExtractorScraper.scrapingIndex.pageNewIndex >= urls.length - 1) {
+                scraperTuple.urlSectionExtractorScraper.scrapingIndex.pageNewIndex = 1;
+                yield this.updateIndex(scraperTuple.urlSectionExtractorScraper.scrapingIndex);
+            }
+            while (scraperTuple.urlSectionExtractorScraper.scrapingIndex.pageNewIndex <= urls.length - 1) {
+                scraperTuple.urlSectionExtractorScraper.scrapingIndex = scraperTuple.urlSectionExtractorScraper.scrapingIndex;
+                const url = urls[scraperTuple.urlSectionExtractorScraper.scrapingIndex.pageNewIndex];
+                if (url) {
+                    console.log("*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-");
+                    console.log("scraping url " + "page: " + scraperTuple.urlSectionExtractorScraper.scrapingIndex.pageNewIndex + " url number: " + scraperTuple.urlSectionExtractorScraper.scrapingIndex.urlIndex);
+                    console.log(url);
+                    console.log("*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-");
+                    let extractedNews = yield scraperTuple.pageScraper.extractNewInUrl(url, scraperTuple.urlSectionExtractorScraper.scrapingIndex.scraperId);
+                    yield this.saveNewsScraped(extractedNews);
+                }
+                scraperTuple.urlSectionExtractorScraper.scrapingIndex.pageNewIndex = scraperTuple.urlSectionExtractorScraper.scrapingIndex.pageNewIndex + 1;
+                yield this.updateIndex(scraperTuple.urlSectionExtractorScraper.scrapingIndex);
+            }
+            yield this.setUpNextIteration(scraperTuple);
         });
     }
     setUpNextIteration(scraperTuple) {

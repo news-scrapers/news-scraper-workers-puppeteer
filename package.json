@@ -6,7 +6,6 @@
   "scripts": {
     "start": "node dist/src/main.js",
     "test": "mocha",
-    "build": "tsc",
     "build": "tsc"
   },
   "repository": {
@@ -38,6 +37,7 @@
     "mongoose": "^5.9.7",
     "puppeteer": "^2.1.1",
     "puppeteer-extra": "^3.1.9",
+    "puppeteer-extra-plugin-adblocker": "^2.11.9",
     "puppeteer-extra-plugin-stealth": "^2.4.9",
     "ts-jest": "^24.1.0",
     "ts-node": "^8.4.1",

@@ -17,6 +17,7 @@ const puppeteer_extra_1 = __importDefault(require("puppeteer-extra"));
 //import randomUA = require('modern-random-ua')
 const user_agents_1 = __importDefault(require("user-agents"));
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
+const AdblockerPlugin = require('puppeteer-extra-plugin-adblocker');
 const userAgent = new user_agents_1.default();
 class PuppeteerScraper {
     constructor(configPath = "../config/scrapingConfig.json") {
@@ -29,8 +30,15 @@ class PuppeteerScraper {
     initializePuppeteer() {
         return __awaiter(this, void 0, void 0, function* () {
             console.log("initializing puppeteer");
+            //puppeteer.use(AdblockerPlugin({ blockTrackers: true }))
             this.browser = yield puppeteer_extra_1.default.use(StealthPlugin()).launch({
-                headless: true,
+                headless: false,
+                ignoreHTTPSErrors: true,
+                slowMo: 0,
+                args: ['--window-size=1400,900',
+                    '--remote-debugging-port=9222',
+                    "--remote-debugging-address=0.0.0.0",
+                    '--disable-gpu', "--disable-features=IsolateOrigins,site-per-process", '--blink-settings=imagesEnabled=true']
             });
             this.page = yield this.browser.newPage();
             yield this.page.setUserAgent(userAgent.toString());

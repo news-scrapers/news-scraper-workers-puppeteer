@@ -5,7 +5,7 @@ import uuidv1 from 'uuid/v1'
 //import randomUA = require('modern-random-ua')
 import UserAgent from 'user-agents';
 const StealthPlugin = require('puppeteer-extra-plugin-stealth')
-
+const AdblockerPlugin = require('puppeteer-extra-plugin-adblocker')
 
 const userAgent = new UserAgent();
 
@@ -28,8 +28,16 @@ export class PuppeteerScraper {
     async initializePuppeteer() {
         
         console.log("initializing puppeteer");
+        //puppeteer.use(AdblockerPlugin({ blockTrackers: true }))
+
         this.browser = await puppeteer.use(StealthPlugin()).launch({
             headless: true,
+            ignoreHTTPSErrors: true,
+            slowMo: 0,
+            args: ['--window-size=1400,900',
+                '--remote-debugging-port=9222',
+                "--remote-debugging-address=0.0.0.0", // You know what your doing?
+                '--disable-gpu', "--disable-features=IsolateOrigins,site-per-process", '--blink-settings=imagesEnabled=true']
         });
         
         this.page = await this.browser.newPage();
