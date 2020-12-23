@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.NewScraped = void 0;
 const mongoose_1 = __importDefault(require("mongoose"));
 const newScrapedSchema = new mongoose_1.default.Schema({
-    source: String,
+    newspaper: String,
     date: Date,
     scrapedAt: Date,
     content: String,

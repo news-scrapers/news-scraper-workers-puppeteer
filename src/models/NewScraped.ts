@@ -5,7 +5,7 @@ import mongoose from "mongoose";
 export type NewScrapedDocument = mongoose.Document & NewScrapedI
 
 const newScrapedSchema = new mongoose.Schema({
-    source: String,
+    newspaper: String,
     date: Date,
     scrapedAt: Date,
     content: String,
@@ -20,7 +20,7 @@ const newScrapedSchema = new mongoose.Schema({
 
 
 export interface NewScrapedI {
-    source: string
+    newspaper: string
     date: Date
     scrapedAt: Date
     content: string

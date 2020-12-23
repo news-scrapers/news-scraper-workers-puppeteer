@@ -8,13 +8,18 @@ import {v4} from 'uuid'
 export class TheSunNewContentScraper extends ContentScraper {
     public timeWaitStart: number
     public timeWaitClick: number
-    constructor() {
+    public newspaper: string
+    public scraperId: string
+
+    constructor(scraperId: string, newspaper:string) {
         super();
+        this.newspaper = newspaper
+        this.scraperId = scraperId
         this.timeWaitStart = 1 * 1000
         this.timeWaitClick = 500
     }
 
-    async extractNewInUrl(url: string, scraperId: string):Promise<NewScrapedI> {
+    async extractNewInUrl(url: string):Promise<NewScrapedI> {
         // https://www.thesun.co.uk/tvandshowbiz/13409249/mark-wright-found-car-stolen-essex/
         console.log("\n---");
         console.log("extracting full new in url:")
@@ -27,13 +32,15 @@ export class TheSunNewContentScraper extends ContentScraper {
             await this.page.goto(url, {waitUntil: 'load', timeout: 0});
             await this.page.waitFor(this.timeWaitStart);
             await this.clickOkButtonCookie()
+            
             const div = await this.page.$('div.article-switcheroo');
+
             const [content, headline, tags, date] = await Promise.all([this.extractBody(div),this.extractHeadline(div), this.extractTags(), this.extractDate()])
 
             await this.browser.close();
             await this.page.waitFor(this.timeWaitStart);
 
-            let results = {id:v4(), url,headline, content, date,tags, scraperId, scrapedAt:new Date()} as NewScrapedI
+            let results = {id:v4(), url,headline, content, date,tags, scraperId:this.scraperId, newspaper:this.newspaper, scrapedAt:new Date()} as NewScrapedI
             return results;
 
         } catch (err) {

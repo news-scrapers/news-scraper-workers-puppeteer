@@ -8,15 +8,19 @@ import {v4} from 'uuid'
 export class BBCNewContentScraper extends ContentScraper {
     public timeWaitStart: number
     public timeWaitClick: number
+    public newspaper: string
+    public scraperId: string
     public excludedParagraphs = ["Please include a contact number if you are willing to speak to a BBC journalist", "If you are reading this page and can't see the form" ]
 
-    constructor() {
+    constructor(scraperId: string, newspaper:string) {
         super();
+        this.newspaper = newspaper
+        this.scraperId = scraperId
         this.timeWaitStart = 1 * 1000
         this.timeWaitClick = 500
     }
 
-    async extractNewInUrl(url: string, scraperId: string):Promise<NewScrapedI> {
+    async extractNewInUrl(url: string):Promise<NewScrapedI> {
         // https://www.thesun.co.uk/tvandshowbiz/13409249/mark-wright-found-car-stolen-essex/
         console.log("\n---");
         console.log("extracting full new in url:")
@@ -34,7 +38,7 @@ export class BBCNewContentScraper extends ContentScraper {
             await this.browser.close();
             await this.page.waitFor(this.timeWaitStart);
 
-            let results = {id:v4(), url,headline, content, date,tags, scraperId, scrapedAt:new Date()} as NewScrapedI
+            let results = {id:v4(), url,headline, content, date,tags, scraperId:this.scraperId, newspaper:this.newspaper, scrapedAt:new Date()} as NewScrapedI
             return results;
 
         } catch (err) {

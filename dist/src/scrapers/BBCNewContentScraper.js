@@ -13,16 +13,18 @@ exports.BBCNewContentScraper = void 0;
 const ContentScraper_1 = require("./ContentScraper");
 const uuid_1 = require("uuid");
 class BBCNewContentScraper extends ContentScraper_1.ContentScraper {
-    constructor() {
+    constructor(scraperId, newspaper) {
         super();
         this.excludedParagraphs = ["Please include a contact number if you are willing to speak to a BBC journalist", "If you are reading this page and can't see the form"];
         this.cleanUp = (text) => {
             return text.replace(/\n/g, " ");
         };
+        this.newspaper = newspaper;
+        this.scraperId = scraperId;
         this.timeWaitStart = 1 * 1000;
         this.timeWaitClick = 500;
     }
-    extractNewInUrl(url, scraperId) {
+    extractNewInUrl(url) {
         return __awaiter(this, void 0, void 0, function* () {
             // https://www.thesun.co.uk/tvandshowbiz/13409249/mark-wright-found-car-stolen-essex/
             console.log("\n---");
@@ -36,7 +38,7 @@ class BBCNewContentScraper extends ContentScraper_1.ContentScraper {
                 const [content, headline, tags, date] = yield Promise.all([this.extractBody(div), this.extractHeadline(div), this.extractTags(div), this.extractDate(div)]);
                 yield this.browser.close();
                 yield this.page.waitFor(this.timeWaitStart);
-                let results = { id: uuid_1.v4(), url, headline, content, date, tags, scraperId, scrapedAt: new Date() };
+                let results = { id: uuid_1.v4(), url, headline, content, date, tags, scraperId: this.scraperId, newspaper: this.newspaper, scrapedAt: new Date() };
                 return results;
             }
             catch (err) {

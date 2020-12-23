@@ -38,7 +38,7 @@ export default class ScraperApp {
             if (newspaper === "bbc") {
                 const indexScraper = await this.prepareIndex(newspaper)
                 const scraper = {
-                    pageScraper: new BBCNewContentScraper(),
+                    pageScraper: new BBCNewContentScraper(indexScraper.scraperId, indexScraper.newspaper),
                     urlSectionExtractorScraper: new BBCNewIndexScraper(indexScraper)
                 } as ScraperTuple
                 this.scrapers.push(scraper)
@@ -47,7 +47,7 @@ export default class ScraperApp {
             if (newspaper === "thesunuk" || newspaper === "thesunus") {
                 const indexScraper = await this.prepareIndex(newspaper)
                 const scraper = {
-                    pageScraper: new TheSunNewContentScraper(),
+                    pageScraper: new TheSunNewContentScraper(indexScraper.scraperId, indexScraper.newspaper),
                     urlSectionExtractorScraper: new TheSunNewIndexScraper(indexScraper)
                 } as ScraperTuple
                 this.scrapers.push(scraper)

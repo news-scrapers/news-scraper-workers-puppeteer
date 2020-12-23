@@ -34,7 +34,7 @@ class ScraperApp {
                 if (newspaper === "bbc") {
                     const indexScraper = yield this.prepareIndex(newspaper);
                     const scraper = {
-                        pageScraper: new BBCNewContentScraper_1.BBCNewContentScraper(),
+                        pageScraper: new BBCNewContentScraper_1.BBCNewContentScraper(indexScraper.scraperId, indexScraper.newspaper),
                         urlSectionExtractorScraper: new BBCNewIndexScraper_1.BBCNewIndexScraper(indexScraper)
                     };
                     this.scrapers.push(scraper);
@@ -42,7 +42,7 @@ class ScraperApp {
                 if (newspaper === "thesunuk" || newspaper === "thesunus") {
                     const indexScraper = yield this.prepareIndex(newspaper);
                     const scraper = {
-                        pageScraper: new TheSunNewContentScraper_1.TheSunNewContentScraper(),
+                        pageScraper: new TheSunNewContentScraper_1.TheSunNewContentScraper(indexScraper.scraperId, indexScraper.newspaper),
                         urlSectionExtractorScraper: new TheSunNewIndexScraper_1.TheSunNewIndexScraper(indexScraper)
                     };
                     this.scrapers.push(scraper);
