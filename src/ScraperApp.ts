@@ -6,7 +6,7 @@ import {TheSunNewIndexScraper} from "./scrapers/TheSunNewIndexScraper";
 import {TheSunNewContentScraper} from "./scrapers/TheSunNewContentScraper";
 
 import mongoose from 'mongoose';
-import scrapingConfig from './config/scrapingConfig.json';
+import scrapingConfig from './config/scrapingConfigFull.json';
 import {ScrapingConfigI} from "./models/ScrapingConfig";
 import {NewScraped, NewScrapedI} from "./models/NewScraped";
 
@@ -33,7 +33,7 @@ export default class ScraperApp {
         for (let newspaper of this.config.newspapers) {
             console.log("loading index for " + newspaper)
 
-            if (newspaper === "thesun") {
+            if (newspaper === "thesunuk" || newspaper === "thesunus") {
                 let indexScraper = await this.findCurrentIndex(newspaper)
                 if (!indexScraper || !indexScraper.scraperId) {
                     indexScraper = this.loadIndexFromConfig(newspaper)

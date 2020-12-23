@@ -10,7 +10,7 @@ export class TheSunNewIndexScraper extends IndexScraper {
     public scrapingIndex: ScrapingIndexI
     public urls:string[] = []
 
-    constructor(scrapingIndex: ScrapingIndexI, configPath= "../config/scrapingConfig.json") {
+    constructor(scrapingIndex: ScrapingIndexI, configPath= "../config/scrapingConfigFull.json") {
         super(configPath);
         this.scrapingIndex = scrapingIndex
         this.timeWaitStart = 1 * 1000;

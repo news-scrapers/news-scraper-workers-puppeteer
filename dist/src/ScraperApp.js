@@ -16,20 +16,20 @@ const ScrapingIndex_1 = require("./models/ScrapingIndex");
 const TheSunNewIndexScraper_1 = require("./scrapers/TheSunNewIndexScraper");
 const TheSunNewContentScraper_1 = require("./scrapers/TheSunNewContentScraper");
 const mongoose_1 = __importDefault(require("mongoose"));
-const scrapingConfig_json_1 = __importDefault(require("./config/scrapingConfig.json"));
+const scrapingConfigFull_json_1 = __importDefault(require("./config/scrapingConfigFull.json"));
 const NewScraped_1 = require("./models/NewScraped");
 require('dotenv').config();
 mongoose_1.default.connect(process.env["MONGODB_URL"], { useNewUrlParser: true, useUnifiedTopology: true });
 class ScraperApp {
     constructor() {
-        this.config = scrapingConfig_json_1.default;
+        this.config = scrapingConfigFull_json_1.default;
         this.scrapers = [];
     }
     loadIndexAndScrapers() {
         return __awaiter(this, void 0, void 0, function* () {
             for (let newspaper of this.config.newspapers) {
                 console.log("loading index for " + newspaper);
-                if (newspaper === "thesun") {
+                if (newspaper === "thesunuk" || newspaper === "thesunus") {
                     let indexScraper = yield this.findCurrentIndex(newspaper);
                     if (!indexScraper || !indexScraper.scraperId) {
                         indexScraper = this.loadIndexFromConfig(newspaper);

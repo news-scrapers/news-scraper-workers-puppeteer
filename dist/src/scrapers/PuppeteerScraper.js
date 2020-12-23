@@ -20,7 +20,7 @@ const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 const AdblockerPlugin = require('puppeteer-extra-plugin-adblocker');
 const userAgent = new user_agents_1.default();
 class PuppeteerScraper {
-    constructor(configPath = "../config/scrapingConfig.json") {
+    constructor(configPath = "../config/scrapingConfigFull.json") {
         this.config = require(configPath);
         this.browser = null;
         this.pageHistoric = null;

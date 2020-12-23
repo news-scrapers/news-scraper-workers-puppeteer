@@ -16,7 +16,7 @@ export class PuppeteerScraper {
     public api: any;
     public page: Page;
 
-    constructor(configPath= "../config/scrapingConfig.json") {
+    constructor(configPath= "../config/scrapingConfigFull.json") {
         this.config = require(configPath);
         this.browser = null;
         this.pageHistoric = null;

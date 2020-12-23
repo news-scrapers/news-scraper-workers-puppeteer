@@ -5,7 +5,7 @@ import {ScrapingIndexI} from "../models/ScrapingIndex";
 import {ContentScraper} from "./ContentScraper";
 import {v4} from 'uuid'
 
-export class TheSunNewContentScraper extends ContentScraper {
+export class TheSunUsNewContentScraper extends ContentScraper {
     public timeWaitStart: number
     public timeWaitClick: number
     constructor(configPath= "../config/scrapingConfigFull.json") {

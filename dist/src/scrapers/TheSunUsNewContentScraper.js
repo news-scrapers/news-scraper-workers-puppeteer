@@ -9,10 +9,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.TheSunNewContentScraper = void 0;
+exports.TheSunUsNewContentScraper = void 0;
 const ContentScraper_1 = require("./ContentScraper");
 const uuid_1 = require("uuid");
-class TheSunNewContentScraper extends ContentScraper_1.ContentScraper {
+class TheSunUsNewContentScraper extends ContentScraper_1.ContentScraper {
     constructor(configPath = "../config/scrapingConfigFull.json") {
         super(configPath);
         this.cleanUp = (text) => {
@@ -108,5 +108,5 @@ class TheSunNewContentScraper extends ContentScraper_1.ContentScraper {
         });
     }
 }
-exports.TheSunNewContentScraper = TheSunNewContentScraper;
-//# sourceMappingURL=TheSunNewContentScraper.js.map
+exports.TheSunUsNewContentScraper = TheSunUsNewContentScraper;
+//# sourceMappingURL=TheSunUsNewContentScraper.js.map

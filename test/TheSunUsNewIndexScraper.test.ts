@@ -8,14 +8,15 @@ describe('the sun new scraper', function () {
     describe('test scraper in a for a given new', function () {
 
         const date = new Date()
-        const testIndex = {urlIndex:1, pageNewIndex:2, startingUrls:
-                ["https://www.thesun.co.uk/tech/",
-                "https://www.thesun.co.uk/travel/",
-                "https://www.thesun.co.uk/tv/"]
+        const testIndex = {
+            urlIndex: 1, pageNewIndex: 2, startingUrls:
+                ["https://www.the-sun.com/news",
+                    "https://www.the-sun.com/news/us-news",
+                    "https://www.the-sun.com/news/world-news"]
         } as ScrapingIndexI
 
         const scraper = new TheSunNewIndexScraper(testIndex);
-        scraper.maxPages=3
+        scraper.maxPages = 3
         jest.setTimeout(59999)
 
 

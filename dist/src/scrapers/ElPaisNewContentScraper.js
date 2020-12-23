@@ -16,7 +16,7 @@ exports.ElPaisNewContentScraper = void 0;
 const PuppeteerScraper_1 = require("./PuppeteerScraper");
 const html_to_text_1 = __importDefault(require("html-to-text"));
 class ElPaisNewContentScraper extends PuppeteerScraper_1.PuppeteerScraper {
-    constructor(configPath = "../config/scrapingConfig.json") {
+    constructor(configPath = "../config/scrapingConfigFull.json") {
         super(configPath);
         this.timeWaitStart = 1 * 1000;
         this.timeWaitClick = 500;

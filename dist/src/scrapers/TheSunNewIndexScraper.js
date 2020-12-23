@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.TheSunNewIndexScraper = void 0;
 const IndexScraper_1 = require("./IndexScraper");
 class TheSunNewIndexScraper extends IndexScraper_1.IndexScraper {
-    constructor(scrapingIndex, configPath = "../config/scrapingConfig.json") {
+    constructor(scrapingIndex, configPath = "../config/scrapingConfigFull.json") {
         super(configPath);
         this.urls = [];
         this.scrapingIndex = scrapingIndex;
