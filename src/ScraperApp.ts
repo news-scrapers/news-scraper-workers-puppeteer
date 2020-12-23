@@ -21,7 +21,7 @@ export interface ScraperTuple {
 }
 
 export default class ScraperApp {
-    public config: ScrapingConfigI = scrapingConfig as ScrapingConfigI
+    public config: any = scrapingConfig as any
 
     public scrapers: ScraperTuple[] = [];
 
@@ -92,12 +92,12 @@ export default class ScraperApp {
     loadIndexFromConfig(newspaper: string): ScrapingIndexI {
         const indexScraper = {} as ScrapingIndexI
         indexScraper.urlIndex = 0
-        indexScraper.startingUrls = this.config.startingUrls[newspaper]
+        indexScraper.startingUrls = this.config.scrapingSettings[newspaper].startingUrls
         indexScraper.pageNewIndex = 1
         indexScraper.newspaper = newspaper
         indexScraper.scraperId = this.config.scraperId
         indexScraper.deviceId = this.config.deviceId
-        indexScraper.maxPages = this.config.maxPages
+        indexScraper.maxPages = this.config.scrapingSettings[newspaper].maxPages
         return indexScraper
     }
 

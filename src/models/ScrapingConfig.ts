@@ -18,11 +18,15 @@ const scrapingConfigSchema = new mongoose.Schema({
 export interface ScrapingConfigI{
     scraperId: string;
     appId: string;
-    maxPages: number;
     deviceId:string;
     newspapers:string[];
-    startingUrls: any;
+    scrapingSettings: Map<string, ScrapingSettings>;
 
+}
+
+export interface ScrapingSettings{
+    maxPages: number;
+    startingUrls:string[];
 }
 
 export const ScrapingConfig = mongoose.model<ScrapingConfigDocument>("ScrapingConfig", scrapingConfigSchema);
