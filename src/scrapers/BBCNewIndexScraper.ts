@@ -3,7 +3,7 @@ import htmlToText from 'html-to-text'
 import {ScrapingIndexI} from "../models/ScrapingIndex";
 import {IndexScraper} from "./IndexScraper";
 
-export class TheSunNewIndexScraper extends IndexScraper {
+export class BBCNewIndexScraper extends IndexScraper {
     public timeWaitStart: number
     public timeWaitClick: number
     public maxPages: number
@@ -69,9 +69,8 @@ export class TheSunNewIndexScraper extends IndexScraper {
             await this.page.goto(pageUrl, {waitUntil: 'load', timeout: 0});
             await this.page.waitFor(this.timeWaitStart);
             await this.clickOkButtonCookie()
-            const div = await this.page.$('section.sun-container__home-section');
 
-            const urlsInPage = await  this.extractUrlsFromPage(div);
+            const urlsInPage = await  this.extractUrlsFromPage();
 
             await this.browser.close();
             await this.page.waitFor(this.timeWaitStart);
@@ -86,7 +85,6 @@ export class TheSunNewIndexScraper extends IndexScraper {
         }
     }
 
-
     async clickOkButtonCookie () {
         try {
             const frame = this.page.frames()
@@ -96,10 +94,8 @@ export class TheSunNewIndexScraper extends IndexScraper {
         }
     }
 
-
-
-    async extractUrlsFromPage(div: any): Promise<string[]>{
-        const hrefs = await div.$$eval('a.teaser-anchor', (as:any) => as.map((a:any) => a.href));
+    async extractUrlsFromPage(): Promise<string[]>{
+        const hrefs = await this.page.$$eval('a.qa-story-image-link', (as:any) => as.map((a:any) => a.href));
         return hrefs
     }
 

@@ -10,14 +10,12 @@ const AdblockerPlugin = require('puppeteer-extra-plugin-adblocker')
 const userAgent = new UserAgent();
 
 export class PuppeteerScraper {
-    public config: any;
     public browser: Browser;
     public pageHistoric: any;
     public api: any;
     public page: Page;
 
-    constructor(configPath= "../config/scrapingConfigFull.json") {
-        this.config = require(configPath);
+    constructor() {
         this.browser = null;
         this.pageHistoric = null;
         //this.api = new ScraperDataAccess();
@@ -37,7 +35,7 @@ export class PuppeteerScraper {
             args: ['--window-size=1400,900',
                 '--remote-debugging-port=9222',
                 "--remote-debugging-address=0.0.0.0", // You know what your doing?
-                '--disable-gpu', "--disable-features=IsolateOrigins,site-per-process", '--blink-settings=imagesEnabled=true']
+                '--disable-gpu', "--disable-features=IsolateOrigins,site-per-process", '--blink-settings=imagesEnabled=false']
         });
         
         this.page = await this.browser.newPage();
@@ -63,17 +61,6 @@ export class PuppeteerScraper {
     async reopenBrowser() {
         await this.browser.close();
         await this.initializePuppeteer()
-    }
-
-    async clickOkButtonCookie () {
-        try {
-            const frame = this.page.frames()
-            //frame[2].click('button[title="Fine By Me!"]');
-        } catch (e) {
-
-        }
-
-
     }
 
 

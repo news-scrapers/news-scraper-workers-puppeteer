@@ -20,8 +20,7 @@ const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 const AdblockerPlugin = require('puppeteer-extra-plugin-adblocker');
 const userAgent = new user_agents_1.default();
 class PuppeteerScraper {
-    constructor(configPath = "../config/scrapingConfigFull.json") {
-        this.config = require(configPath);
+    constructor() {
         this.browser = null;
         this.pageHistoric = null;
         //this.api = new ScraperDataAccess();
@@ -38,7 +37,7 @@ class PuppeteerScraper {
                 args: ['--window-size=1400,900',
                     '--remote-debugging-port=9222',
                     "--remote-debugging-address=0.0.0.0",
-                    '--disable-gpu', "--disable-features=IsolateOrigins,site-per-process", '--blink-settings=imagesEnabled=true']
+                    '--disable-gpu', "--disable-features=IsolateOrigins,site-per-process", '--blink-settings=imagesEnabled=false']
             });
             this.page = yield this.browser.newPage();
             yield this.page.setUserAgent(userAgent.toString());
@@ -60,16 +59,6 @@ class PuppeteerScraper {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.browser.close();
             yield this.initializePuppeteer();
-        });
-    }
-    clickOkButtonCookie() {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const frame = this.page.frames();
-                //frame[2].click('button[title="Fine By Me!"]');
-            }
-            catch (e) {
-            }
         });
     }
     savePartialResults(results) {

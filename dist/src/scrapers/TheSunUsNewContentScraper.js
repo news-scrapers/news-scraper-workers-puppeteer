@@ -109,4 +109,4 @@ class TheSunUsNewContentScraper extends ContentScraper_1.ContentScraper {
     }
 }
 exports.TheSunUsNewContentScraper = TheSunUsNewContentScraper;
-//# sourceMappingURL=TheSunUsNewContentScraper.js.map
+//# sourceMappingURL=BBCNewContentScraper.js.map

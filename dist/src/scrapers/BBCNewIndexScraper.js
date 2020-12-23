@@ -9,9 +9,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.TheSunNewIndexScraper = void 0;
+exports.BBCNewIndexScraper = void 0;
 const IndexScraper_1 = require("./IndexScraper");
-class TheSunNewIndexScraper extends IndexScraper_1.IndexScraper {
+class BBCNewIndexScraper extends IndexScraper_1.IndexScraper {
     constructor(scrapingIndex) {
         super();
         this.urls = [];
@@ -69,8 +69,7 @@ class TheSunNewIndexScraper extends IndexScraper_1.IndexScraper {
                 yield this.page.goto(pageUrl, { waitUntil: 'load', timeout: 0 });
                 yield this.page.waitFor(this.timeWaitStart);
                 yield this.clickOkButtonCookie();
-                const div = yield this.page.$('section.sun-container__home-section');
-                const urlsInPage = yield this.extractUrlsFromPage(div);
+                const urlsInPage = yield this.extractUrlsFromPage();
                 yield this.browser.close();
                 yield this.page.waitFor(this.timeWaitStart);
                 return urlsInPage;
@@ -93,12 +92,12 @@ class TheSunNewIndexScraper extends IndexScraper_1.IndexScraper {
             }
         });
     }
-    extractUrlsFromPage(div) {
+    extractUrlsFromPage() {
         return __awaiter(this, void 0, void 0, function* () {
-            const hrefs = yield div.$$eval('a.teaser-anchor', (as) => as.map((a) => a.href));
+            const hrefs = yield this.page.$$eval('a.qa-story-image-link', (as) => as.map((a) => a.href));
             return hrefs;
         });
     }
 }
-exports.TheSunNewIndexScraper = TheSunNewIndexScraper;
-//# sourceMappingURL=TheSunNewIndexScraper.js.map
+exports.BBCNewIndexScraper = BBCNewIndexScraper;
+//# sourceMappingURL=BBCNewIndexScraper.js.map

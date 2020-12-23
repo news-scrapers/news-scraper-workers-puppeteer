@@ -9,12 +9,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.TheSunNewContentScraper = void 0;
+exports.BBCNewContentScraper = void 0;
 const ContentScraper_1 = require("./ContentScraper");
 const uuid_1 = require("uuid");
-class TheSunNewContentScraper extends ContentScraper_1.ContentScraper {
+class BBCNewContentScraper extends ContentScraper_1.ContentScraper {
     constructor() {
         super();
+        this.excludedParagraphs = ["Please include a contact number if you are willing to speak to a BBC journalist", "If you are reading this page and can't see the form"];
         this.cleanUp = (text) => {
             return text.replace(/\n/g, " ");
         };
@@ -31,10 +32,8 @@ class TheSunNewContentScraper extends ContentScraper_1.ContentScraper {
             yield this.initializePuppeteer();
             try {
                 yield this.page.goto(url, { waitUntil: 'load', timeout: 0 });
-                yield this.page.waitFor(this.timeWaitStart);
-                yield this.clickOkButtonCookie();
-                const div = yield this.page.$('div.article-switcheroo');
-                const [content, headline, tags, date] = yield Promise.all([this.extractBody(div), this.extractHeadline(div), this.extractTags(), this.extractDate()]);
+                const div = yield this.page.$('article');
+                const [content, headline, tags, date] = yield Promise.all([this.extractBody(div), this.extractHeadline(div), this.extractTags(div), this.extractDate(div)]);
                 yield this.browser.close();
                 yield this.page.waitFor(this.timeWaitStart);
                 let results = { id: uuid_1.v4(), url, headline, content, date, tags, scraperId, scrapedAt: new Date() };
@@ -50,15 +49,16 @@ class TheSunNewContentScraper extends ContentScraper_1.ContentScraper {
     }
     extractBody(div) {
         return __awaiter(this, void 0, void 0, function* () {
-            /*
-            const html =  await (await div.getProperty('innerHTML')).jsonValue();
-            const text = htmlToText.fromString(html, {
-                wordwrap: 130,
-                ignoreHref:true
-            });
-            */
             try {
-                const text = yield this.page.evaluate(element => element.textContent, div);
+                const pars = yield div.$$("div[data-component='text-block']");
+                let text = '';
+                for (let par of pars) {
+                    const textPar = yield this.page.evaluate(element => element.textContent, par);
+                    const hasExcludedText = this.excludedParagraphs.some((text) => textPar.includes(text));
+                    if (!hasExcludedText) {
+                        text = text + '\n ' + textPar;
+                    }
+                }
                 return text;
             }
             catch (e) {
@@ -67,25 +67,45 @@ class TheSunNewContentScraper extends ContentScraper_1.ContentScraper {
             }
         });
     }
-    extractDate() {
+    extractDate(div) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const date = yield this.page.$eval("head > meta[property='article:published_time']", (element) => element.content);
+                const date = yield div.$eval("time", (el) => el.getAttribute("datetime"));
                 return new Date(date);
             }
             catch (e) {
+                console.log(e);
                 return null;
             }
         });
     }
-    extractTags() {
+    extractTags(div) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                let tags = yield this.page.$eval("head > meta[property='article:tag']", (element) => element.content);
-                if (tags && tags.includes(",")) {
-                    return tags.split(",").map((elem) => (elem.trim()));
-                }
-                return [tags];
+                const tags = yield div.evaluate(() => {
+                    const as = document.getElementsByTagName('a');
+                    const tags = [];
+                    for (let a of as) {
+                        if (a.href.includes("/topics/")) {
+                            tags.push(a.textContent);
+                        }
+                    }
+                    return tags;
+                });
+                return tags;
+            }
+            catch (e) {
+                console.log(e);
+                return null;
+            }
+        });
+    }
+    extractHeadline(div) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const h1Headline = yield div.$('h1#main-heading');
+                const headline = yield (yield h1Headline.getProperty('textContent')).jsonValue();
+                return headline;
             }
             catch (e) {
                 return null;
@@ -102,18 +122,6 @@ class TheSunNewContentScraper extends ContentScraper_1.ContentScraper {
             }
         });
     }
-    extractHeadline(div) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const h1Headline = yield div.$('p.article__content--intro');
-                const headline = yield (yield h1Headline.getProperty('textContent')).jsonValue();
-                return headline;
-            }
-            catch (e) {
-                return "";
-            }
-        });
-    }
 }
-exports.TheSunNewContentScraper = TheSunNewContentScraper;
-//# sourceMappingURL=TheSunNewContentScraper.js.map
+exports.BBCNewContentScraper = BBCNewContentScraper;
+//# sourceMappingURL=BBCNewContentScraper.js.map

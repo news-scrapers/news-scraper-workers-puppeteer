@@ -3,8 +3,17 @@
   "deviceId": "deviceTest",
   "appId": "deviceTestApp",
   "maxPages": 20,
-   "newspapers": ["thesunus","thesunuk"],
+   "newspapers": ["bbc","thesunus","thesunuk"],
   "startingUrls": {
+    "bbc": ["https://www.bbc.com/news/live/entertainment-arts-47639448",
+      "https://www.bbc.com/news/live/explainers-51871385",
+      "https://www.bbc.com/news/live/world-47639450",
+      "https://www.bbc.com/news/live/uk-48270993",
+      "https://www.bbc.com/news/live/business-47737521",
+      "https://www.bbc.com/news/live/technology-47078793",
+      "https://www.bbc.com/news/live/science-environment-47179475",
+      "https://www.bbc.com/news/live/health-47160630"
+    ],
     "thesunus": [
       "https://www.the-sun.com/news",
       "https://www.the-sun.com/news/us-news",

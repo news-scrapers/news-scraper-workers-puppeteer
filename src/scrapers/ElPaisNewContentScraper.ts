@@ -4,8 +4,8 @@ import htmlToText from 'html-to-text'
 export class ElPaisNewContentScraper extends PuppeteerScraper {
     public timeWaitStart: number
     public timeWaitClick: number
-    constructor(configPath= "../config/scrapingConfigFull.json") {
-        super(configPath);
+    constructor() {
+        super();
         this.timeWaitStart = 1 * 1000;
         this.timeWaitClick = 500;
     }

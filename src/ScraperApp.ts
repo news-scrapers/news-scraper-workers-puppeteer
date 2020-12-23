@@ -9,6 +9,8 @@ import mongoose from 'mongoose';
 import scrapingConfig from './config/scrapingConfigFull.json';
 import {ScrapingConfigI} from "./models/ScrapingConfig";
 import {NewScraped, NewScrapedI} from "./models/NewScraped";
+import {BBCNewIndexScraper} from "./scrapers/BBCNewIndexScraper";
+import {BBCNewContentScraper} from "./scrapers/BBCNewContentScraper";
 
 require('dotenv').config();
 mongoose.connect(process.env["MONGODB_URL"], {useNewUrlParser: true, useUnifiedTopology: true});
@@ -33,15 +35,17 @@ export default class ScraperApp {
         for (let newspaper of this.config.newspapers) {
             console.log("loading index for " + newspaper)
 
+            if (newspaper === "bbc") {
+                const indexScraper = await this.prepareIndex(newspaper)
+                const scraper = {
+                    pageScraper: new BBCNewContentScraper(),
+                    urlSectionExtractorScraper: new BBCNewIndexScraper(indexScraper)
+                } as ScraperTuple
+                this.scrapers.push(scraper)
+            }
+
             if (newspaper === "thesunuk" || newspaper === "thesunus") {
-                let indexScraper = await this.findCurrentIndex(newspaper)
-                if (!indexScraper || !indexScraper.scraperId) {
-                    indexScraper = this.loadIndexFromConfig(newspaper)
-                }
-                console.log(indexScraper)
-
-                await this.updateIndex(indexScraper)
-
+                const indexScraper = await this.prepareIndex(newspaper)
                 const scraper = {
                     pageScraper: new TheSunNewContentScraper(),
                     urlSectionExtractorScraper: new TheSunNewIndexScraper(indexScraper)
@@ -49,6 +53,19 @@ export default class ScraperApp {
                 this.scrapers.push(scraper)
             }
         }
+
+    }
+
+    async prepareIndex(newspaper: string): Promise<ScrapingIndexI> {
+        let indexScraper = await this.findCurrentIndex(newspaper)
+
+        if (!indexScraper || !indexScraper.scraperId) {
+            indexScraper = this.loadIndexFromConfig(newspaper)
+        }
+        console.log(indexScraper)
+
+        await this.updateIndex(indexScraper)
+        return indexScraper
 
     }
 

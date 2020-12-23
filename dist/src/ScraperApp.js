@@ -18,6 +18,8 @@ const TheSunNewContentScraper_1 = require("./scrapers/TheSunNewContentScraper");
 const mongoose_1 = __importDefault(require("mongoose"));
 const scrapingConfigFull_json_1 = __importDefault(require("./config/scrapingConfigFull.json"));
 const NewScraped_1 = require("./models/NewScraped");
+const BBCNewIndexScraper_1 = require("./scrapers/BBCNewIndexScraper");
+const BBCNewContentScraper_1 = require("./scrapers/BBCNewContentScraper");
 require('dotenv').config();
 mongoose_1.default.connect(process.env["MONGODB_URL"], { useNewUrlParser: true, useUnifiedTopology: true });
 class ScraperApp {
@@ -29,13 +31,16 @@ class ScraperApp {
         return __awaiter(this, void 0, void 0, function* () {
             for (let newspaper of this.config.newspapers) {
                 console.log("loading index for " + newspaper);
+                if (newspaper === "bbc") {
+                    const indexScraper = yield this.prepareIndex(newspaper);
+                    const scraper = {
+                        pageScraper: new BBCNewContentScraper_1.BBCNewContentScraper(),
+                        urlSectionExtractorScraper: new BBCNewIndexScraper_1.BBCNewIndexScraper(indexScraper)
+                    };
+                    this.scrapers.push(scraper);
+                }
                 if (newspaper === "thesunuk" || newspaper === "thesunus") {
-                    let indexScraper = yield this.findCurrentIndex(newspaper);
-                    if (!indexScraper || !indexScraper.scraperId) {
-                        indexScraper = this.loadIndexFromConfig(newspaper);
-                    }
-                    console.log(indexScraper);
-                    yield this.updateIndex(indexScraper);
+                    const indexScraper = yield this.prepareIndex(newspaper);
                     const scraper = {
                         pageScraper: new TheSunNewContentScraper_1.TheSunNewContentScraper(),
                         urlSectionExtractorScraper: new TheSunNewIndexScraper_1.TheSunNewIndexScraper(indexScraper)
@@ -43,6 +48,17 @@ class ScraperApp {
                     this.scrapers.push(scraper);
                 }
             }
+        });
+    }
+    prepareIndex(newspaper) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let indexScraper = yield this.findCurrentIndex(newspaper);
+            if (!indexScraper || !indexScraper.scraperId) {
+                indexScraper = this.loadIndexFromConfig(newspaper);
+            }
+            console.log(indexScraper);
+            yield this.updateIndex(indexScraper);
+            return indexScraper;
         });
     }
     updateIndex(index) {
