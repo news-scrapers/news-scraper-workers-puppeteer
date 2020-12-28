@@ -7,6 +7,8 @@ exports.NewScraped = void 0;
 const mongoose_1 = __importDefault(require("mongoose"));
 const newScrapedSchema = new mongoose_1.default.Schema({
     newspaper: String,
+    image: String,
+    author: String,
     date: Date,
     scrapedAt: Date,
     content: String,

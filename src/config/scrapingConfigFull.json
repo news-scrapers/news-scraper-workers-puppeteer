@@ -3,11 +3,43 @@
   "deviceId": "deviceTest",
   "appId": "deviceTestApp",
   "newspapers": [
+    "cnn",
     "bbc",
     "thesunus",
     "thesunuk"
   ],
   "scrapingSettings": {
+    "cnn": {
+      "maxPages": 1,
+      "startingUrls": [
+        "https://edition.cnn.com/world",
+        "https://edition.cnn.com/africa",
+        "https://edition.cnn.com/asia",
+        "https://edition.cnn.com/australia",
+        "https://edition.cnn.com/china",
+        "https://edition.cnn.com/europe",
+        "https://edition.cnn.com/india",
+        "https://edition.cnn.com/middle-east",
+        "https://edition.cnn.com/uk",
+        "https://us.cnn.com/business",
+        "https://us.cnn.com/business/tech",
+        "https://us.cnn.com/business/media",
+        "https://us.cnn.com/business/success",
+        "https://us.cnn.com/business/perspectives",
+        "https://us.cnn.com/opinions",
+        "https://us.cnn.com/health",
+        "https://us.cnn.com/specials/health/food-diet",
+        "https://us.cnn.com/specials/health/fitness-excercise",
+        "https://us.cnn.com/specials/health/wellness",
+        "https://us.cnn.com/specials/health/parenting",
+        "https://us.cnn.com/specials/health/vital-signs",
+        "https://edition.cnn.com/entertainment/celebrities",
+        "https://edition.cnn.com/entertainment/movies",
+        "https://edition.cnn.com/entertainment/tv-shows",
+        "https://edition.cnn.com/entertainment/culture",
+        "https://edition.cnn.com/business/media"
+      ]
+    },
     "bbc": {
       "maxPages": 50,
       "startingUrls": [

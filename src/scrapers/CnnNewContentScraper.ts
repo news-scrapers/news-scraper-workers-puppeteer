@@ -27,8 +27,11 @@ export class CnnNewContentScraper extends ContentScraper {
         console.log(url);
         console.log("---");
 
-        await this.initializePuppeteer();
-
+        try {
+            await this.initializePuppeteer();
+        } catch (e) {
+            console.log("error initializing")
+        }
         try {
             await this.page.goto(url, {waitUntil: 'load', timeout: 0});
 

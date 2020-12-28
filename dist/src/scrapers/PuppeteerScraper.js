@@ -31,7 +31,7 @@ class PuppeteerScraper {
             console.log("initializing puppeteer");
             //puppeteer.use(AdblockerPlugin({ blockTrackers: true }))
             this.browser = yield puppeteer_extra_1.default.use(StealthPlugin()).launch({
-                headless: true,
+                headless: false,
                 ignoreHTTPSErrors: true,
                 slowMo: 0,
                 args: ['--window-size=1400,900',

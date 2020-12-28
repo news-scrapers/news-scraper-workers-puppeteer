@@ -11,6 +11,8 @@ import {ScrapingConfigI} from "./models/ScrapingConfig";
 import {NewScraped, NewScrapedI} from "./models/NewScraped";
 import {BBCNewIndexScraper} from "./scrapers/BBCNewIndexScraper";
 import {BBCNewContentScraper} from "./scrapers/BBCNewContentScraper";
+import {CnnNewContentScraper} from "./scrapers/CnnNewContentScraper";
+import {CnnNewIndexScraper} from "./scrapers/CnnNewIndexScraper";
 
 require('dotenv').config();
 mongoose.connect(process.env["MONGODB_URL"], {useNewUrlParser: true, useUnifiedTopology: true});
@@ -34,6 +36,15 @@ export default class ScraperApp {
     async loadIndexAndScrapers() {
         for (let newspaper of this.config.newspapers) {
             console.log("loading index for " + newspaper)
+
+            if (newspaper === "cnn") {
+                const indexScraper = await this.prepareIndex(newspaper)
+                const scraper = {
+                    pageScraper: new CnnNewContentScraper(indexScraper.scraperId, indexScraper.newspaper),
+                    urlSectionExtractorScraper: new CnnNewIndexScraper(indexScraper)
+                } as ScraperTuple
+                this.scrapers.push(scraper)
+            }
 
             if (newspaper === "bbc") {
                 const indexScraper = await this.prepareIndex(newspaper)
@@ -70,12 +81,18 @@ export default class ScraperApp {
     }
 
     async updateIndex(index: ScrapingIndexI) {
-        index.dateScraping = new Date()
-        const scrapingIndexDocument = await ScrapingIndex.findOneAndUpdate({
-                scraperId: index.scraperId,
-                newspaper: index.newspaper
-            },
-            index, {upsert: true})
+        try {
+            index.dateScraping = new Date()
+            const scrapingIndexDocument = await ScrapingIndex.findOneAndUpdate({
+                    scraperId: index.scraperId,
+                    newspaper: index.newspaper
+                },
+                index, {upsert: true})
+        } catch (e) {
+            console.log("ERROR UPDATING INDEX")
+            throw e
+        }
+
     }
 
     async findCurrentIndex(newspaper: string): Promise<ScrapingIndexI> {
@@ -112,6 +129,7 @@ export default class ScraperApp {
             } catch (e) {
                 console.log( "----------------------------------")
                 console.log("ERROR")
+                console.log(e)
                 console.log( "----------------------------------")
             }
         }
@@ -123,6 +141,7 @@ export default class ScraperApp {
         console.log(urls)
 
         if (scraperTuple.urlSectionExtractorScraper.scrapingIndex.pageNewIndex >= urls.length - 1) {
+            console.log("RESETING_____________")
             scraperTuple.urlSectionExtractorScraper.scrapingIndex.pageNewIndex = 1
             await this.updateIndex(scraperTuple.urlSectionExtractorScraper.scrapingIndex)
         }
@@ -138,6 +157,7 @@ export default class ScraperApp {
                 console.log("*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-")
 
                 let extractedNews = await scraperTuple.pageScraper.extractNewInUrl(url, scraperTuple.urlSectionExtractorScraper.scrapingIndex.scraperId)
+                console.log(extractedNews)
                 await this.saveNewsScraped(extractedNews)
 
             }
@@ -162,8 +182,14 @@ export default class ScraperApp {
     }
 
     async saveNewsScraped(newItem: NewScrapedI) {
-        const scrapingIndexDocument = await NewScraped.findOneAndUpdate({url: newItem.url},
-            newItem, {upsert: true})
+        try {
+            const scrapingIndexDocument = await NewScraped.findOneAndUpdate({url: newItem.url},
+                newItem, {upsert: true})
+        } catch (e) {
+           console.log("ERROR SAVING")
+            throw e
+        }
+
     }
 
 } 

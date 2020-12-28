@@ -20,6 +20,8 @@ const scrapingConfigFull_json_1 = __importDefault(require("./config/scrapingConf
 const NewScraped_1 = require("./models/NewScraped");
 const BBCNewIndexScraper_1 = require("./scrapers/BBCNewIndexScraper");
 const BBCNewContentScraper_1 = require("./scrapers/BBCNewContentScraper");
+const CnnNewContentScraper_1 = require("./scrapers/CnnNewContentScraper");
+const CnnNewIndexScraper_1 = require("./scrapers/CnnNewIndexScraper");
 require('dotenv').config();
 mongoose_1.default.connect(process.env["MONGODB_URL"], { useNewUrlParser: true, useUnifiedTopology: true });
 class ScraperApp {
@@ -31,6 +33,14 @@ class ScraperApp {
         return __awaiter(this, void 0, void 0, function* () {
             for (let newspaper of this.config.newspapers) {
                 console.log("loading index for " + newspaper);
+                if (newspaper === "cnn") {
+                    const indexScraper = yield this.prepareIndex(newspaper);
+                    const scraper = {
+                        pageScraper: new CnnNewContentScraper_1.CnnNewContentScraper(indexScraper.scraperId, indexScraper.newspaper),
+                        urlSectionExtractorScraper: new CnnNewIndexScraper_1.CnnNewIndexScraper(indexScraper)
+                    };
+                    this.scrapers.push(scraper);
+                }
                 if (newspaper === "bbc") {
                     const indexScraper = yield this.prepareIndex(newspaper);
                     const scraper = {
@@ -63,11 +73,17 @@ class ScraperApp {
     }
     updateIndex(index) {
         return __awaiter(this, void 0, void 0, function* () {
-            index.dateScraping = new Date();
-            const scrapingIndexDocument = yield ScrapingIndex_1.ScrapingIndex.findOneAndUpdate({
-                scraperId: index.scraperId,
-                newspaper: index.newspaper
-            }, index, { upsert: true });
+            try {
+                index.dateScraping = new Date();
+                const scrapingIndexDocument = yield ScrapingIndex_1.ScrapingIndex.findOneAndUpdate({
+                    scraperId: index.scraperId,
+                    newspaper: index.newspaper
+                }, index, { upsert: true });
+            }
+            catch (e) {
+                console.log("ERROR UPDATING INDEX");
+                throw e;
+            }
         });
     }
     findCurrentIndex(newspaper) {
@@ -107,6 +123,7 @@ class ScraperApp {
                     catch (e) {
                         console.log("----------------------------------");
                         console.log("ERROR");
+                        console.log(e);
                         console.log("----------------------------------");
                     }
                 }
@@ -118,6 +135,7 @@ class ScraperApp {
             console.log("starting scraping urls ");
             console.log(urls);
             if (scraperTuple.urlSectionExtractorScraper.scrapingIndex.pageNewIndex >= urls.length - 1) {
+                console.log("RESETING_____________");
                 scraperTuple.urlSectionExtractorScraper.scrapingIndex.pageNewIndex = 1;
                 yield this.updateIndex(scraperTuple.urlSectionExtractorScraper.scrapingIndex);
             }
@@ -130,6 +148,7 @@ class ScraperApp {
                     console.log(url);
                     console.log("*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-");
                     let extractedNews = yield scraperTuple.pageScraper.extractNewInUrl(url, scraperTuple.urlSectionExtractorScraper.scrapingIndex.scraperId);
+                    console.log(extractedNews);
                     yield this.saveNewsScraped(extractedNews);
                 }
                 scraperTuple.urlSectionExtractorScraper.scrapingIndex.pageNewIndex = scraperTuple.urlSectionExtractorScraper.scrapingIndex.pageNewIndex + 1;
@@ -151,7 +170,13 @@ class ScraperApp {
     }
     saveNewsScraped(newItem) {
         return __awaiter(this, void 0, void 0, function* () {
-            const scrapingIndexDocument = yield NewScraped_1.NewScraped.findOneAndUpdate({ url: newItem.url }, newItem, { upsert: true });
+            try {
+                const scrapingIndexDocument = yield NewScraped_1.NewScraped.findOneAndUpdate({ url: newItem.url }, newItem, { upsert: true });
+            }
+            catch (e) {
+                console.log("ERROR SAVING");
+                throw e;
+            }
         });
     }
 }

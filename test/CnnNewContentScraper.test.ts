@@ -13,7 +13,7 @@ describe('the sun new scraper', function () {
         const scraper = new CnnNewContentScraper("test","");
         jest.setTimeout(9999999)
         it('scraping results shoud be not null', async function () {
-            const url ="https://edition.cnn.com/2020/12/28/politics/donald-trump-covid-relief-bill/index.html" // "https://www.thesun.co.uk/tvandshowbiz/13409249/mark-wright-found-car-stolen-essex/"
+            const url ="https://edition.cnn.com/2020/12/28/media/donna-langley-universal-movies-risk-takers/index.html" // "https://www.thesun.co.uk/tvandshowbiz/13409249/mark-wright-found-car-stolen-essex/"
             const result = await scraper.extractNewInUrl(url);
             console.log(result);
             expect(result).toHaveProperty("content")
