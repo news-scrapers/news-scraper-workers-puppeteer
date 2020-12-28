@@ -6,6 +6,8 @@ export type NewScrapedDocument = mongoose.Document & NewScrapedI
 
 const newScrapedSchema = new mongoose.Schema({
     newspaper: String,
+    image: String,
+    author: String,
     date: Date,
     scrapedAt: Date,
     content: String,
@@ -21,6 +23,8 @@ const newScrapedSchema = new mongoose.Schema({
 
 export interface NewScrapedI {
     newspaper: string
+    author: string
+    image: string
     date: Date
     scrapedAt: Date
     content: string
