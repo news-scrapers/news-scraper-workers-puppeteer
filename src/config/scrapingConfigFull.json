@@ -3,12 +3,65 @@
   "deviceId": "deviceTest",
   "appId": "deviceTestApp",
   "newspapers": [
+    "guardianuk",
     "cnn",
     "bbc",
     "thesunus",
     "thesunuk"
   ],
   "scrapingSettings": {
+    "guardianus": {
+      "maxPages": 1,
+      "startingUrls": [
+        "https://www.theguardian.com/us/commentisfree",
+        "https://www.theguardian.com/us/sport",
+        "https://www.theguardian.com/us/culture",
+        "https://www.theguardian.com/us/lifeandstyle",
+        "https://www.theguardian.com/us-news",
+        "https://www.theguardian.com/us/environment",
+        "https://www.theguardian.com/us/technology",
+        "https://www.theguardian.com/us/business",
+        "https://www.theguardian.com/us/tv-and-radio"
+      ]
+    },
+    "guardianuk": {
+      "maxPages": 1,
+      "startingUrls": [
+        "https://www.theguardian.com/international",
+        "https://www.theguardian.com/uk/commentisfree",
+        "https://www.theguardian.com/uk/sport",
+        "https://www.theguardian.com/uk/culture",
+        "https://www.theguardian.com/uk/lifeandstyle",
+        "https://www.theguardian.com/world/coronavirus-outbreak",
+        "https://www.theguardian.com/world",
+        "https://www.theguardian.com/uk-news",
+        "https://www.theguardian.com/uk/environment",
+        "https://www.theguardian.com/global-development",
+        "https://www.theguardian.com/football",
+        "https://www.theguardian.com/uk/technology",
+        "https://www.theguardian.com/uk/business",
+        "https://www.theguardian.com/tone/obituaries",
+        "https://www.theguardian.com/profile/editorial",
+        "https://www.theguardian.com/index/contributors",
+        "https://www.theguardian.com/tone/letters",
+        "https://www.theguardian.com/sport/cricket",
+        "https://www.theguardian.com/sport/rugby-union",
+        "https://www.theguardian.com/sport/tennis",
+        "https://www.theguardian.com/sport/formulaone",
+        "https://www.theguardian.com/sport/golf",
+        "https://www.theguardian.com/books",
+        "https://www.theguardian.com/music",
+        "https://www.theguardian.com/uk/tv-and-radio",
+        "https://www.theguardian.com/games",
+        "https://www.theguardian.com/music/classical-music-and-opera",
+        "https://www.theguardian.com/stage",
+        "https://www.theguardian.com/fashion",
+        "https://www.theguardian.com/food",
+        "https://www.theguardian.com/tone/recipes",
+        "https://www.theguardian.com/lifeandstyle/love-and-sex",
+        "https://www.theguardian.com/lifeandstyle/health-and-wellbeing"
+      ]
+    },
     "cnn": {
       "maxPages": 1,
       "startingUrls": [

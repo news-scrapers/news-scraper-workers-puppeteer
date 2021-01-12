@@ -22,6 +22,8 @@ const BBCNewIndexScraper_1 = require("./scrapers/BBCNewIndexScraper");
 const BBCNewContentScraper_1 = require("./scrapers/BBCNewContentScraper");
 const CnnNewContentScraper_1 = require("./scrapers/CnnNewContentScraper");
 const CnnNewIndexScraper_1 = require("./scrapers/CnnNewIndexScraper");
+const GuardianNewContentScraper_1 = require("./scrapers/GuardianNewContentScraper");
+const GuardianNewIndexScraper_1 = require("./scrapers/GuardianNewIndexScraper");
 require('dotenv').config();
 mongoose_1.default.connect(process.env["MONGODB_URL"], { useNewUrlParser: true, useUnifiedTopology: true });
 class ScraperApp {
@@ -33,6 +35,22 @@ class ScraperApp {
         return __awaiter(this, void 0, void 0, function* () {
             for (let newspaper of this.config.newspapers) {
                 console.log("loading index for " + newspaper);
+                if (newspaper === "guardianus") {
+                    const indexScraper = yield this.prepareIndex(newspaper);
+                    const scraper = {
+                        pageScraper: new GuardianNewContentScraper_1.GuardianNewContentScraper(indexScraper.scraperId, indexScraper.newspaper),
+                        urlSectionExtractorScraper: new GuardianNewIndexScraper_1.GuardianNewIndexScraper(indexScraper)
+                    };
+                    this.scrapers.push(scraper);
+                }
+                if (newspaper === "guardianuk") {
+                    const indexScraper = yield this.prepareIndex(newspaper);
+                    const scraper = {
+                        pageScraper: new GuardianNewContentScraper_1.GuardianNewContentScraper(indexScraper.scraperId, indexScraper.newspaper),
+                        urlSectionExtractorScraper: new GuardianNewIndexScraper_1.GuardianNewIndexScraper(indexScraper)
+                    };
+                    this.scrapers.push(scraper);
+                }
                 if (newspaper === "cnn") {
                     const indexScraper = yield this.prepareIndex(newspaper);
                     const scraper = {

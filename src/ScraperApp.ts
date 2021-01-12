@@ -13,6 +13,8 @@ import {BBCNewIndexScraper} from "./scrapers/BBCNewIndexScraper";
 import {BBCNewContentScraper} from "./scrapers/BBCNewContentScraper";
 import {CnnNewContentScraper} from "./scrapers/CnnNewContentScraper";
 import {CnnNewIndexScraper} from "./scrapers/CnnNewIndexScraper";
+import {GuardianNewContentScraper} from "./scrapers/GuardianNewContentScraper";
+import {GuardianNewIndexScraper} from "./scrapers/GuardianNewIndexScraper";
 
 require('dotenv').config();
 mongoose.connect(process.env["MONGODB_URL"], {useNewUrlParser: true, useUnifiedTopology: true});
@@ -36,6 +38,24 @@ export default class ScraperApp {
     async loadIndexAndScrapers() {
         for (let newspaper of this.config.newspapers) {
             console.log("loading index for " + newspaper)
+
+            if (newspaper === "guardianus") {
+                const indexScraper = await this.prepareIndex(newspaper)
+                const scraper = {
+                    pageScraper: new GuardianNewContentScraper(indexScraper.scraperId, indexScraper.newspaper),
+                    urlSectionExtractorScraper: new GuardianNewIndexScraper(indexScraper)
+                } as ScraperTuple
+                this.scrapers.push(scraper)
+            }
+
+            if (newspaper === "guardianuk") {
+                const indexScraper = await this.prepareIndex(newspaper)
+                const scraper = {
+                    pageScraper: new GuardianNewContentScraper(indexScraper.scraperId, indexScraper.newspaper),
+                    urlSectionExtractorScraper: new GuardianNewIndexScraper(indexScraper)
+                } as ScraperTuple
+                this.scrapers.push(scraper)
+            }
 
             if (newspaper === "cnn") {
                 const indexScraper = await this.prepareIndex(newspaper)
