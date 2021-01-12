@@ -77,8 +77,9 @@ class GuardianNewContentScraper extends ContentScraper_1.ContentScraper {
     extractDate() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const date = yield this.page.$eval("head > meta[property='og:title']", (element) => element.content);
-                return new Date(date);
+                let date = yield this.page.$eval("head > meta[property='article:published_time']", (element) => element.content);
+                date = new Date(date);
+                return date;
             }
             catch (e) {
                 return null;

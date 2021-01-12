@@ -77,8 +77,9 @@ export class GuardianNewContentScraper extends ContentScraper {
 
     async extractDate(): Promise<Date> {
         try {
-            const date = await this.page.$eval("head > meta[property='og:title']", (element:any) => element.content);
-            return new Date(date)
+            let date = await this.page.$eval("head > meta[property='article:published_time']", (element:any) => element.content);
+            date =  new Date(date)
+            return date
         } catch (e) {
             return null
         }

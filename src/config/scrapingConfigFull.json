@@ -3,6 +3,7 @@
   "deviceId": "deviceTest",
   "appId": "deviceTestApp",
   "newspapers": [
+    "guardianus",
     "guardianuk",
     "cnn",
     "bbc",
