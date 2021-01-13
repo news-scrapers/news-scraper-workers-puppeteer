@@ -15,6 +15,8 @@ import {CnnNewContentScraper} from "./scrapers/CnnNewContentScraper";
 import {CnnNewIndexScraper} from "./scrapers/CnnNewIndexScraper";
 import {GuardianNewContentScraper} from "./scrapers/GuardianNewContentScraper";
 import {GuardianNewIndexScraper} from "./scrapers/GuardianNewIndexScraper";
+import {UsatodayNewContentScraper} from "./scrapers/UsatodayNewContentScraper";
+import {UsatodayNewIndexScraper} from "./scrapers/UsatodayNewIndexScraper";
 
 require('dotenv').config();
 mongoose.connect(process.env["MONGODB_URL"], {useNewUrlParser: true, useUnifiedTopology: true});
@@ -48,6 +50,14 @@ export default class ScraperApp {
                 this.scrapers.push(scraper)
             }
 
+            if (newspaper === "usatoday") {
+                const indexScraper = await this.prepareIndex(newspaper)
+                const scraper = {
+                    pageScraper: new UsatodayNewContentScraper(indexScraper.scraperId, indexScraper.newspaper),
+                    urlSectionExtractorScraper: new UsatodayNewIndexScraper(indexScraper)
+                } as ScraperTuple
+                this.scrapers.push(scraper)
+            }
             if (newspaper === "guardianuk") {
                 const indexScraper = await this.prepareIndex(newspaper)
                 const scraper = {
