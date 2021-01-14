@@ -2,6 +2,8 @@
     "scraperId": "scraperTest",
     "deviceId": "deviceTest",
     "appId": "deviceTestApp",
+    "useSqliteDb": true,
+    "useMongoDb": true,
     "newspapers": [
         "usatoday",
         "guardianus",

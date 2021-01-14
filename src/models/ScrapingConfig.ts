@@ -10,7 +10,9 @@ const scrapingConfigSchema = new mongoose.Schema({
     maxPages: Number,
     deviceId:String,
     newspapers: Array(String),
-    startingUrls: Object
+    startingUrls: Object,
+    useSqliteDb: Boolean,
+    useMongoDb: Boolean
 }, { timestamps: true });
 
 
@@ -20,6 +22,8 @@ export interface ScrapingConfigI{
     appId: string;
     deviceId:string;
     newspapers:string[];
+    useSqliteDb: boolean;
+    useMongoDb: boolean;
     scrapingSettings: Map<string, ScrapingSettings>;
 
 }

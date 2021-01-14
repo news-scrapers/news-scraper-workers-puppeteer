@@ -11,7 +11,9 @@ const scrapingConfigSchema = new mongoose_1.default.Schema({
     maxPages: Number,
     deviceId: String,
     newspapers: Array(String),
-    startingUrls: Object
+    startingUrls: Object,
+    useSqliteDb: Boolean,
+    useMongoDb: Boolean
 }, { timestamps: true });
 exports.ScrapingConfig = mongoose_1.default.model("ScrapingConfig", scrapingConfigSchema);
 //# sourceMappingURL=ScrapingConfig.js.map

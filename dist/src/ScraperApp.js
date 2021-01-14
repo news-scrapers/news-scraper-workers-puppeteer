@@ -26,12 +26,14 @@ const GuardianNewContentScraper_1 = require("./scrapers/GuardianNewContentScrape
 const GuardianNewIndexScraper_1 = require("./scrapers/GuardianNewIndexScraper");
 const UsatodayNewContentScraper_1 = require("./scrapers/UsatodayNewContentScraper");
 const UsatodayNewIndexScraper_1 = require("./scrapers/UsatodayNewIndexScraper");
+const models_1 = require("./models");
 require('dotenv').config();
 mongoose_1.default.connect(process.env["MONGODB_URL"], { useNewUrlParser: true, useUnifiedTopology: true });
 class ScraperApp {
     constructor() {
         this.config = scrapingConfigFull_json_1.default;
         this.scrapers = [];
+        this.joiningStr = "====";
     }
     loadIndexAndScrapers() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -39,6 +41,7 @@ class ScraperApp {
                 console.log("loading index for " + newspaper);
                 if (newspaper === "guardianus") {
                     const indexScraper = yield this.prepareIndex(newspaper);
+                    console.log(indexScraper);
                     const scraper = {
                         pageScraper: new GuardianNewContentScraper_1.GuardianNewContentScraper(indexScraper.scraperId, indexScraper.newspaper),
                         urlSectionExtractorScraper: new GuardianNewIndexScraper_1.GuardianNewIndexScraper(indexScraper)
@@ -92,42 +95,17 @@ class ScraperApp {
         return __awaiter(this, void 0, void 0, function* () {
             let indexScraper = yield this.findCurrentIndex(newspaper);
             if (!indexScraper || !indexScraper.scraperId) {
+                console.log(indexScraper);
                 indexScraper = this.loadIndexFromConfig(newspaper);
             }
-            console.log(indexScraper);
             yield this.updateIndex(indexScraper);
             return indexScraper;
         });
     }
-    updateIndex(index) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                index.dateScraping = new Date();
-                const scrapingIndexDocument = yield ScrapingIndex_1.ScrapingIndex.findOneAndUpdate({
-                    scraperId: index.scraperId,
-                    newspaper: index.newspaper
-                }, index, { upsert: true });
-            }
-            catch (e) {
-                console.log("ERROR UPDATING INDEX");
-                throw e;
-            }
-        });
-    }
-    findCurrentIndex(newspaper) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const scrapingIndexDocument = yield ScrapingIndex_1.ScrapingIndex.findOne({
-                scraperId: this.config.scraperId,
-                newspaper: newspaper
-            }).exec();
-            if (scrapingIndexDocument) {
-                return scrapingIndexDocument.toObject();
-            }
-            else
-                return null;
-        });
-    }
     loadIndexFromConfig(newspaper) {
+        console.log("@---------------------------------------@");
+        console.log("loading from config");
+        console.log("@---------------------------------------@");
         const indexScraper = {};
         indexScraper.urlIndex = 0;
         indexScraper.startingUrls = this.config.scrapingSettings[newspaper].startingUrls;
@@ -140,6 +118,7 @@ class ScraperApp {
     }
     startScraper() {
         return __awaiter(this, void 0, void 0, function* () {
+            yield models_1.initDb();
             yield this.loadIndexAndScrapers();
             let continueScraping = true;
             let scrapedCount = 0;
@@ -196,14 +175,104 @@ class ScraperApp {
             yield this.updateIndex(scraperTuple.urlSectionExtractorScraper.scrapingIndex);
         });
     }
+    updateIndex(index) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const indexDb = Object.create(index);
+            const conditions = {
+                scraperId: indexDb.scraperId,
+                newspaper: indexDb.newspaper
+            };
+            indexDb.dateScraping = new Date();
+            if (this.config.useMongoDb) {
+                try {
+                    yield ScrapingIndex_1.ScrapingIndex.findOneAndUpdate(conditions, indexDb, { upsert: true });
+                }
+                catch (e) {
+                    console.log("ERROR UPDATING INDEX mongo");
+                    throw e;
+                }
+            }
+            if (this.config.useSqliteDb) {
+                try {
+                    const indexSql = ScrapingIndex_1.convertToScrapingIndexSqlI(indexDb);
+                    const found = yield ScrapingIndex_1.ScrapingIndexSql.findOne({ where: conditions });
+                    if (found) {
+                        yield ScrapingIndex_1.ScrapingIndexSql.update(indexSql, { where: conditions });
+                    }
+                    else {
+                        yield ScrapingIndex_1.ScrapingIndexSql.create(indexSql);
+                    }
+                }
+                catch (e) {
+                    console.log("ERROR UPDATING INDEX sqlite");
+                    throw e;
+                }
+            }
+        });
+    }
+    findCurrentIndex(newspaper) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const conditions = {
+                //scraperId: this.config.scraperId,
+                newspaper: newspaper
+            };
+            if (this.config.useSqliteDb) {
+                try {
+                    const scrapingIndexDocumentM = yield ScrapingIndex_1.ScrapingIndexSql.findOne({ where: conditions });
+                    if (scrapingIndexDocumentM) {
+                        const index = ScrapingIndex_1.convertScrapingIndexSqlI(scrapingIndexDocumentM.toJSON());
+                        return index;
+                    }
+                    return null;
+                }
+                catch (e) {
+                    console.log("error saving using sqlite");
+                    throw e;
+                }
+            }
+            if (this.config.useMongoDb) {
+                try {
+                    let scrapingIndexDocument = yield ScrapingIndex_1.ScrapingIndex.findOne(conditions).exec();
+                    if (scrapingIndexDocument) {
+                        return scrapingIndexDocument.toObject();
+                    }
+                    else
+                        return null;
+                }
+                catch (e) {
+                    console.log("error saving using mongodb");
+                    throw e;
+                }
+            }
+        });
+    }
     saveNewsScraped(newItem) {
         return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const scrapingIndexDocument = yield NewScraped_1.NewScraped.findOneAndUpdate({ url: newItem.url }, newItem, { upsert: true });
+            const conditions = { url: newItem.url };
+            if (this.config.useSqliteDb) {
+                try {
+                    const newsSql = NewScraped_1.convertToNewsScrapedSqlI(newItem);
+                    const found = yield NewScraped_1.NewScrapedSql.findOne({ where: conditions });
+                    if (found) {
+                        yield NewScraped_1.NewScrapedSql.update(newsSql, { where: conditions });
+                    }
+                    else {
+                        yield NewScraped_1.NewScrapedSql.create(newsSql);
+                    }
+                }
+                catch (e) {
+                    console.log("ERROR SAVING sqlite");
+                    throw e;
+                }
             }
-            catch (e) {
-                console.log("ERROR SAVING");
-                throw e;
+            if (this.config.useMongoDb) {
+                try {
+                    const scrapingIndexDocument = yield NewScraped_1.NewScraped.findOneAndUpdate(conditions, newItem, { upsert: true });
+                }
+                catch (e) {
+                    console.log("ERROR SAVING mongo");
+                    throw e;
+                }
             }
         });
     }
