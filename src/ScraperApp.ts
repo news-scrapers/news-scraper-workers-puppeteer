@@ -20,6 +20,7 @@ import {UsatodayNewContentScraper} from "./scrapers/UsatodayNewContentScraper";
 import {UsatodayNewIndexScraper} from "./scrapers/UsatodayNewIndexScraper";
 import {initDb} from "./models/sequelizeConfig";
 import PersistenceManager from "./PersistenceManager";
+import {GlobalConfigI} from "./models/GlobalConfig";
 
 require('dotenv').config();
 mongoose.connect(process.env["MONGODB_URL"], {useNewUrlParser: true, useUnifiedTopology: true});
@@ -35,6 +36,7 @@ export default class ScraperApp {
     public scrapers: ScraperTuple[] = [];
     public joiningStr = "===="
     public scrapingIndex: ScrapingIndexDocument;
+    public globalConfig: GlobalConfigI;
     public persistenceManager: PersistenceManager
     constructor() {
     }
@@ -42,8 +44,11 @@ export default class ScraperApp {
     async loadIndexAndScrapers() {
 
         this.persistenceManager = new PersistenceManager(this.config)
+        await this.prepareGlobalConfig()
 
-        for (let newspaper of this.config.newspapers) {
+        const newspapersReordered = this.reorderNewspaperArrayStartingWithLastScraped()
+
+        for (let newspaper of newspapersReordered) {
             console.log("loading index for " + newspaper)
 
             if (newspaper === "guardianus") {
@@ -102,6 +107,34 @@ export default class ScraperApp {
         }
 
     }
+    async prepareGlobalConfig() {
+        let globalConfig = await this.persistenceManager.findCurrentGlogalConfig()
+        if (globalConfig) {
+            this.globalConfig = globalConfig
+        } else {
+            globalConfig = {} as GlobalConfigI
+            globalConfig.scraperId = this.config.scraperId
+            globalConfig.deviceId = this.config.deviceId
+            globalConfig.lastNewspaper = this.config.newspapers[0]
+            globalConfig.lastActive = new Date()
+            this.globalConfig = globalConfig
+            await this.persistenceManager.updateGlobalConfig(globalConfig)
+        }
+    }
+
+    reorderNewspaperArrayStartingWithLastScraped():string[] {
+        const currentNewspaper = this.globalConfig.lastNewspaper
+        const index = this.config.newspapers.indexOf(currentNewspaper)
+        const newspapersReordered = this.config.newspapers.slice(index).concat(this.config.newspapers.slice(0, index))
+        return newspapersReordered
+    }
+
+    async refreshGlobalConfigFromIndex(index: ScrapingIndexI) {
+        this.globalConfig.lastNewspaper = index.newspaper
+        this.globalConfig.lastActive = new Date()
+        await this.persistenceManager.updateGlobalConfig(this.globalConfig)
+
+    }
 
     async prepareIndex(newspaper: string): Promise<ScrapingIndexI> {
         let indexScraper = await this.persistenceManager.findCurrentIndex(newspaper)
@@ -136,7 +169,6 @@ export default class ScraperApp {
 
         await this.loadIndexAndScrapers()
         let continueScraping = true;
-        let scrapedCount = 0;
 
         while (continueScraping) for (let scraperTuple of this.scrapers) {
             try {
@@ -151,6 +183,8 @@ export default class ScraperApp {
     }
 
     async scrapOneIterationFromOneScraper(scraperTuple: ScraperTuple) {
+        await this.refreshGlobalConfigFromIndex(scraperTuple.urlSectionExtractorScraper.scrapingIndex)
+
         const urls = await scraperTuple.urlSectionExtractorScraper.extractNewsUrlsInSectionPageFromIndexOneIteration()
         console.log("starting scraping urls ")
         console.log(urls)
@@ -174,12 +208,11 @@ export default class ScraperApp {
                 let extractedNews = await scraperTuple.pageScraper.extractNewInUrl(url, scraperTuple.urlSectionExtractorScraper.scrapingIndex.scraperId)
                 console.log(extractedNews)
                 await this.persistenceManager.saveNewsScraped(extractedNews)
-
             }
 
             scraperTuple.urlSectionExtractorScraper.scrapingIndex.pageNewIndex = scraperTuple.urlSectionExtractorScraper.scrapingIndex.pageNewIndex + 1
             await this.persistenceManager.updateIndex(scraperTuple.urlSectionExtractorScraper.scrapingIndex)
-
+            await this.refreshGlobalConfigFromIndex(scraperTuple.urlSectionExtractorScraper.scrapingIndex)
         }
 
         await this.setUpNextIteration(scraperTuple)

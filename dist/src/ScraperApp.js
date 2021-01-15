@@ -37,7 +37,9 @@ class ScraperApp {
     loadIndexAndScrapers() {
         return __awaiter(this, void 0, void 0, function* () {
             this.persistenceManager = new PersistenceManager_1.default(this.config);
-            for (let newspaper of this.config.newspapers) {
+            yield this.prepareGlobalConfig();
+            const newspapersReordered = this.reorderNewspaperArrayStartingWithLastScraped();
+            for (let newspaper of newspapersReordered) {
                 console.log("loading index for " + newspaper);
                 if (newspaper === "guardianus") {
                     const indexScraper = yield this.prepareIndex(newspaper);
@@ -91,6 +93,36 @@ class ScraperApp {
             }
         });
     }
+    prepareGlobalConfig() {
+        return __awaiter(this, void 0, void 0, function* () {
+            let globalConfig = yield this.persistenceManager.findCurrentGlogalConfig();
+            if (globalConfig) {
+                this.globalConfig = globalConfig;
+            }
+            else {
+                globalConfig = {};
+                globalConfig.scraperId = this.config.scraperId;
+                globalConfig.deviceId = this.config.deviceId;
+                globalConfig.lastNewspaper = this.config.newspapers[0];
+                globalConfig.lastActive = new Date();
+                this.globalConfig = globalConfig;
+                yield this.persistenceManager.updateGlobalConfig(globalConfig);
+            }
+        });
+    }
+    reorderNewspaperArrayStartingWithLastScraped() {
+        const currentNewspaper = this.globalConfig.lastNewspaper;
+        const index = this.config.newspapers.indexOf(currentNewspaper);
+        const newspapersReordered = this.config.newspapers.slice(index).concat(this.config.newspapers.slice(0, index));
+        return newspapersReordered;
+    }
+    refreshGlobalConfigFromIndex(index) {
+        return __awaiter(this, void 0, void 0, function* () {
+            this.globalConfig.lastNewspaper = index.newspaper;
+            this.globalConfig.lastActive = new Date();
+            yield this.persistenceManager.updateGlobalConfig(this.globalConfig);
+        });
+    }
     prepareIndex(newspaper) {
         return __awaiter(this, void 0, void 0, function* () {
             let indexScraper = yield this.persistenceManager.findCurrentIndex(newspaper);
@@ -121,7 +153,6 @@ class ScraperApp {
             yield sequelizeConfig_1.initDb();
             yield this.loadIndexAndScrapers();
             let continueScraping = true;
-            let scrapedCount = 0;
             while (continueScraping)
                 for (let scraperTuple of this.scrapers) {
                     try {
@@ -138,6 +169,7 @@ class ScraperApp {
     }
     scrapOneIterationFromOneScraper(scraperTuple) {
         return __awaiter(this, void 0, void 0, function* () {
+            yield this.refreshGlobalConfigFromIndex(scraperTuple.urlSectionExtractorScraper.scrapingIndex);
             const urls = yield scraperTuple.urlSectionExtractorScraper.extractNewsUrlsInSectionPageFromIndexOneIteration();
             console.log("starting scraping urls ");
             console.log(urls);
@@ -160,6 +192,7 @@ class ScraperApp {
                 }
                 scraperTuple.urlSectionExtractorScraper.scrapingIndex.pageNewIndex = scraperTuple.urlSectionExtractorScraper.scrapingIndex.pageNewIndex + 1;
                 yield this.persistenceManager.updateIndex(scraperTuple.urlSectionExtractorScraper.scrapingIndex);
+                yield this.refreshGlobalConfigFromIndex(scraperTuple.urlSectionExtractorScraper.scrapingIndex);
             }
             yield this.setUpNextIteration(scraperTuple);
         });

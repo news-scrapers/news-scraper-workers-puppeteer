@@ -7,6 +7,7 @@ import {
     scrapingIndexSqlAttributes,
 } from "./ScrapingIndexSql";
 import {scrapingUrlSqlAttributes, ScrapingUrlsSql} from "./ScrapingUrlSql";
+import {GlobalConfigSql, globalConfigSqlAttributes} from "./GlobalConfigSql";
 
 export const sequelize =  new Sequelize({
     storage: './database_news.sqlite3',
@@ -38,7 +39,16 @@ export const initDb = async () => {
         }
     )
 
+    GlobalConfigSql.init(
+        globalConfigSqlAttributes,
+        {
+            tableName: "GlobalConfig",
+            sequelize: sequelize, // this bit is important
+        }
+    )
+
     await NewScrapedSql.sync({force: false})
     await ScrapingIndexSql.sync({force: false})
     await ScrapingUrlsSql.sync({force: false})
+    await GlobalConfigSql.sync({force: false})
 }

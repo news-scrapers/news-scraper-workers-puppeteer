@@ -14,6 +14,8 @@ import {
 import {convertToNewsScrapedSqlI, NewScrapedSql} from "./models/NewScrapedSql";
 import {NewScraped, NewScrapedI} from "./models/NewScraped";
 import {ScrapingUrlsSql, ScrapingUrlsSqlI} from "./models/ScrapingUrlSql";
+import {GlobalConfigSql} from "./models/GlobalConfigSql";
+import {GlobalConfig, GlobalConfigI} from "./models/GlobalConfig";
 
 require('dotenv').config();
 mongoose.connect(process.env["MONGODB_URL"], {useNewUrlParser: true, useUnifiedTopology: true});
@@ -109,6 +111,72 @@ export default class PersistenceManager {
             }
         }
         return index
+    }
+
+
+
+    async findCurrentGlogalConfig(): Promise<GlobalConfigI> {
+        let globalConfig: GlobalConfigI
+
+        const conditions = {
+            scraperId: this.config.scraperId,
+        }
+        if (this.config.useSqliteDb) {
+            try {
+                const globalConfigSql = await GlobalConfigSql.findOne({where: conditions})
+
+                if (globalConfigSql) {
+                    globalConfig =  globalConfigSql.toJSON() as GlobalConfigI
+                } else {
+                    globalConfig = null
+                }
+            } catch (e) {
+                console.log("error saving global config using sqlite")
+                throw e
+            }
+
+        }
+
+        if (this.config.useMongoDb) {
+            try {
+                let globalConfgMongo = await GlobalConfig.findOne(conditions).exec();
+
+                if (globalConfgMongo) {
+                    globalConfig = globalConfgMongo.toObject()
+                } else {
+                    globalConfig = null
+                }
+            } catch (e) {
+                console.log("error saving using mongodb")
+                throw e
+            }
+        }
+        return globalConfig
+    }
+
+    async updateGlobalConfig(globalConfig: GlobalConfigI) {
+        const conditions = {
+            scraperId: this.config.scraperId,
+        }
+
+        if (this.config.useSqliteDb) {
+            const found = await GlobalConfigSql.findOne({where: conditions})
+            if (found) {
+                await GlobalConfigSql.update(globalConfig, {where: conditions})
+            } else {
+                await GlobalConfigSql.create(globalConfig)
+            }
+        }
+
+        if (this.config.useMongoDb) {
+            try {
+                await GlobalConfig.findOneAndUpdate(conditions,
+                    globalConfig, {upsert: true})
+            } catch (e) {
+                console.log("ERROR SAVING mongo")
+                throw e
+            }
+        }
     }
 
     async saveNewsScraped(newItem: NewScrapedI) {

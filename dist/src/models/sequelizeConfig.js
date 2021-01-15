@@ -14,6 +14,7 @@ const sequelize_1 = require("sequelize");
 const NewScrapedSql_1 = require("./NewScrapedSql");
 const ScrapingIndexSql_1 = require("./ScrapingIndexSql");
 const ScrapingUrlSql_1 = require("./ScrapingUrlSql");
+const GlobalConfigSql_1 = require("./GlobalConfigSql");
 exports.sequelize = new sequelize_1.Sequelize({
     storage: './database_news.sqlite3',
     dialect: 'sqlite',
@@ -31,9 +32,14 @@ const initDb = () => __awaiter(void 0, void 0, void 0, function* () {
         tableName: "ScrapingUrl",
         sequelize: exports.sequelize,
     });
+    GlobalConfigSql_1.GlobalConfigSql.init(GlobalConfigSql_1.globalConfigSqlAttributes, {
+        tableName: "GlobalConfig",
+        sequelize: exports.sequelize,
+    });
     yield NewScrapedSql_1.NewScrapedSql.sync({ force: false });
     yield ScrapingIndexSql_1.ScrapingIndexSql.sync({ force: false });
     yield ScrapingUrlSql_1.ScrapingUrlsSql.sync({ force: false });
+    yield GlobalConfigSql_1.GlobalConfigSql.sync({ force: false });
 });
 exports.initDb = initDb;
 //# sourceMappingURL=sequelizeConfig.js.map
