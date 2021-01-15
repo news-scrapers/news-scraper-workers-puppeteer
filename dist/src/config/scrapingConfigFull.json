@@ -3,7 +3,7 @@
     "deviceId": "deviceTest",
     "appId": "deviceTestApp",
     "useSqliteDb": true,
-    "useMongoDb": false,
+    "useMongoDb": true,
     "newspapers": [
         "usatoday",
         "guardianus",

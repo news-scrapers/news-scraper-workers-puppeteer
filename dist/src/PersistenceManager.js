@@ -69,6 +69,7 @@ class PersistenceManager {
     }
     findCurrentIndex(newspaper) {
         return __awaiter(this, void 0, void 0, function* () {
+            let index;
             const conditions = {
                 scraperId: this.config.scraperId,
                 newspaper: newspaper
@@ -79,10 +80,11 @@ class PersistenceManager {
                     const scrapingIndexDocumentM = yield ScrapingIndexSql_1.ScrapingIndexSql.findOne({ where: conditions });
                     if (scrapingIndexDocumentM && startingUrlsSql) {
                         const startingUrls = startingUrlsSql.map(item => item.toJSON());
-                        const index = ScrapingIndexSql_1.convertScrapingIndexSqlI(scrapingIndexDocumentM.toJSON(), startingUrls);
-                        return index;
+                        index = ScrapingIndexSql_1.convertScrapingIndexSqlI(scrapingIndexDocumentM.toJSON(), startingUrls);
                     }
-                    return null;
+                    else {
+                        index = null;
+                    }
                 }
                 catch (e) {
                     console.log("error saving using sqlite");
@@ -93,16 +95,18 @@ class PersistenceManager {
                 try {
                     let scrapingIndexDocument = yield ScrapingIndex_1.ScrapingIndex.findOne(conditions).exec();
                     if (scrapingIndexDocument) {
-                        return scrapingIndexDocument.toObject();
+                        index = scrapingIndexDocument.toObject();
                     }
-                    else
-                        return null;
+                    else {
+                        index = null;
+                    }
                 }
                 catch (e) {
                     console.log("error saving using mongodb");
                     throw e;
                 }
             }
+            return index;
         });
     }
     saveNewsScraped(newItem) {

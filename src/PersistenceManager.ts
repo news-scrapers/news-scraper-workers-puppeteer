@@ -52,7 +52,6 @@ export default class PersistenceManager {
 
                 if (found) {
                     await ScrapingIndexSql.update(indexSql, {where: conditions})
-
                 } else {
                     await ScrapingIndexSql.create(indexSql)
                     for (const url of startingUrlsSql) {
@@ -71,6 +70,8 @@ export default class PersistenceManager {
     }
 
     async findCurrentIndex(newspaper: string): Promise<ScrapingIndexI> {
+        let index: ScrapingIndexI
+
         const conditions = {
             scraperId: this.config.scraperId,
             newspaper: newspaper
@@ -82,10 +83,10 @@ export default class PersistenceManager {
                 const scrapingIndexDocumentM = await ScrapingIndexSql.findOne({where: conditions})
                 if (scrapingIndexDocumentM && startingUrlsSql) {
                     const startingUrls = startingUrlsSql.map(item => item.toJSON() as ScrapingUrlsSqlI)
-                    const index = convertScrapingIndexSqlI(scrapingIndexDocumentM.toJSON() as ScrapingIndexSqlI, startingUrls)
-                    return index
+                    index = convertScrapingIndexSqlI(scrapingIndexDocumentM.toJSON() as ScrapingIndexSqlI, startingUrls)
+                } else {
+                    index = null
                 }
-                return null
             } catch (e) {
                 console.log("error saving using sqlite")
                 throw e
@@ -98,14 +99,16 @@ export default class PersistenceManager {
                 let scrapingIndexDocument = await ScrapingIndex.findOne(conditions).exec();
 
                 if (scrapingIndexDocument) {
-                    return scrapingIndexDocument.toObject()
-                } else return null
+                    index = scrapingIndexDocument.toObject()
+                } else {
+                    index = null
+                }
             } catch (e) {
                 console.log("error saving using mongodb")
                 throw e
             }
-
         }
+        return index
     }
 
     async saveNewsScraped(newItem: NewScrapedI) {
@@ -130,7 +133,6 @@ export default class PersistenceManager {
             try {
                 const scrapingIndexDocument = await NewScraped.findOneAndUpdate(conditions,
                     newItem, {upsert: true})
-
             } catch (e) {
                 console.log("ERROR SAVING mongo")
                 throw e
