@@ -12,12 +12,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const ScrapingIndex_1 = require("./models/ScrapingIndex");
 const TheSunNewIndexScraper_1 = require("./scrapers/TheSunNewIndexScraper");
 const TheSunNewContentScraper_1 = require("./scrapers/TheSunNewContentScraper");
 const mongoose_1 = __importDefault(require("mongoose"));
 const scrapingConfigFull_json_1 = __importDefault(require("./config/scrapingConfigFull.json"));
-const NewScraped_1 = require("./models/NewScraped");
 const BBCNewIndexScraper_1 = require("./scrapers/BBCNewIndexScraper");
 const BBCNewContentScraper_1 = require("./scrapers/BBCNewContentScraper");
 const CnnNewContentScraper_1 = require("./scrapers/CnnNewContentScraper");
@@ -26,7 +24,8 @@ const GuardianNewContentScraper_1 = require("./scrapers/GuardianNewContentScrape
 const GuardianNewIndexScraper_1 = require("./scrapers/GuardianNewIndexScraper");
 const UsatodayNewContentScraper_1 = require("./scrapers/UsatodayNewContentScraper");
 const UsatodayNewIndexScraper_1 = require("./scrapers/UsatodayNewIndexScraper");
-const models_1 = require("./models");
+const sequelizeConfig_1 = require("./models/sequelizeConfig");
+const PersistenceManager_1 = __importDefault(require("./PersistenceManager"));
 require('dotenv').config();
 mongoose_1.default.connect(process.env["MONGODB_URL"], { useNewUrlParser: true, useUnifiedTopology: true });
 class ScraperApp {
@@ -37,6 +36,7 @@ class ScraperApp {
     }
     loadIndexAndScrapers() {
         return __awaiter(this, void 0, void 0, function* () {
+            this.persistenceManager = new PersistenceManager_1.default(this.config);
             for (let newspaper of this.config.newspapers) {
                 console.log("loading index for " + newspaper);
                 if (newspaper === "guardianus") {
@@ -93,12 +93,12 @@ class ScraperApp {
     }
     prepareIndex(newspaper) {
         return __awaiter(this, void 0, void 0, function* () {
-            let indexScraper = yield this.findCurrentIndex(newspaper);
+            let indexScraper = yield this.persistenceManager.findCurrentIndex(newspaper);
             if (!indexScraper || !indexScraper.scraperId) {
                 console.log(indexScraper);
                 indexScraper = this.loadIndexFromConfig(newspaper);
             }
-            yield this.updateIndex(indexScraper);
+            yield this.persistenceManager.updateIndex(indexScraper);
             return indexScraper;
         });
     }
@@ -118,7 +118,7 @@ class ScraperApp {
     }
     startScraper() {
         return __awaiter(this, void 0, void 0, function* () {
-            yield models_1.initDb();
+            yield sequelizeConfig_1.initDb();
             yield this.loadIndexAndScrapers();
             let continueScraping = true;
             let scrapedCount = 0;
@@ -144,7 +144,7 @@ class ScraperApp {
             if (scraperTuple.urlSectionExtractorScraper.scrapingIndex.pageNewIndex >= urls.length - 1) {
                 console.log("RESETING_____________");
                 scraperTuple.urlSectionExtractorScraper.scrapingIndex.pageNewIndex = 1;
-                yield this.updateIndex(scraperTuple.urlSectionExtractorScraper.scrapingIndex);
+                yield this.persistenceManager.updateIndex(scraperTuple.urlSectionExtractorScraper.scrapingIndex);
             }
             while (scraperTuple.urlSectionExtractorScraper.scrapingIndex.pageNewIndex <= urls.length - 1) {
                 scraperTuple.urlSectionExtractorScraper.scrapingIndex = scraperTuple.urlSectionExtractorScraper.scrapingIndex;
@@ -156,10 +156,10 @@ class ScraperApp {
                     console.log("*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-");
                     let extractedNews = yield scraperTuple.pageScraper.extractNewInUrl(url, scraperTuple.urlSectionExtractorScraper.scrapingIndex.scraperId);
                     console.log(extractedNews);
-                    yield this.saveNewsScraped(extractedNews);
+                    yield this.persistenceManager.saveNewsScraped(extractedNews);
                 }
                 scraperTuple.urlSectionExtractorScraper.scrapingIndex.pageNewIndex = scraperTuple.urlSectionExtractorScraper.scrapingIndex.pageNewIndex + 1;
-                yield this.updateIndex(scraperTuple.urlSectionExtractorScraper.scrapingIndex);
+                yield this.persistenceManager.updateIndex(scraperTuple.urlSectionExtractorScraper.scrapingIndex);
             }
             yield this.setUpNextIteration(scraperTuple);
         });
@@ -172,108 +172,7 @@ class ScraperApp {
             if (scraperTuple.urlSectionExtractorScraper.scrapingIndex.urlIndex > scraperTuple.urlSectionExtractorScraper.scrapingIndex.startingUrls.length - 1) {
                 scraperTuple.urlSectionExtractorScraper.scrapingIndex.urlIndex = 0;
             }
-            yield this.updateIndex(scraperTuple.urlSectionExtractorScraper.scrapingIndex);
-        });
-    }
-    updateIndex(index) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const indexDb = Object.create(index);
-            const conditions = {
-                scraperId: indexDb.scraperId,
-                newspaper: indexDb.newspaper
-            };
-            indexDb.dateScraping = new Date();
-            if (this.config.useMongoDb) {
-                try {
-                    yield ScrapingIndex_1.ScrapingIndex.findOneAndUpdate(conditions, indexDb, { upsert: true });
-                }
-                catch (e) {
-                    console.log("ERROR UPDATING INDEX mongo");
-                    throw e;
-                }
-            }
-            if (this.config.useSqliteDb) {
-                try {
-                    const indexSql = ScrapingIndex_1.convertToScrapingIndexSqlI(indexDb);
-                    const found = yield ScrapingIndex_1.ScrapingIndexSql.findOne({ where: conditions });
-                    if (found) {
-                        yield ScrapingIndex_1.ScrapingIndexSql.update(indexSql, { where: conditions });
-                    }
-                    else {
-                        yield ScrapingIndex_1.ScrapingIndexSql.create(indexSql);
-                    }
-                }
-                catch (e) {
-                    console.log("ERROR UPDATING INDEX sqlite");
-                    throw e;
-                }
-            }
-        });
-    }
-    findCurrentIndex(newspaper) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const conditions = {
-                //scraperId: this.config.scraperId,
-                newspaper: newspaper
-            };
-            if (this.config.useSqliteDb) {
-                try {
-                    const scrapingIndexDocumentM = yield ScrapingIndex_1.ScrapingIndexSql.findOne({ where: conditions });
-                    if (scrapingIndexDocumentM) {
-                        const index = ScrapingIndex_1.convertScrapingIndexSqlI(scrapingIndexDocumentM.toJSON());
-                        return index;
-                    }
-                    return null;
-                }
-                catch (e) {
-                    console.log("error saving using sqlite");
-                    throw e;
-                }
-            }
-            if (this.config.useMongoDb) {
-                try {
-                    let scrapingIndexDocument = yield ScrapingIndex_1.ScrapingIndex.findOne(conditions).exec();
-                    if (scrapingIndexDocument) {
-                        return scrapingIndexDocument.toObject();
-                    }
-                    else
-                        return null;
-                }
-                catch (e) {
-                    console.log("error saving using mongodb");
-                    throw e;
-                }
-            }
-        });
-    }
-    saveNewsScraped(newItem) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const conditions = { url: newItem.url };
-            if (this.config.useSqliteDb) {
-                try {
-                    const newsSql = NewScraped_1.convertToNewsScrapedSqlI(newItem);
-                    const found = yield NewScraped_1.NewScrapedSql.findOne({ where: conditions });
-                    if (found) {
-                        yield NewScraped_1.NewScrapedSql.update(newsSql, { where: conditions });
-                    }
-                    else {
-                        yield NewScraped_1.NewScrapedSql.create(newsSql);
-                    }
-                }
-                catch (e) {
-                    console.log("ERROR SAVING sqlite");
-                    throw e;
-                }
-            }
-            if (this.config.useMongoDb) {
-                try {
-                    const scrapingIndexDocument = yield NewScraped_1.NewScraped.findOneAndUpdate(conditions, newItem, { upsert: true });
-                }
-                catch (e) {
-                    console.log("ERROR SAVING mongo");
-                    throw e;
-                }
-            }
+            yield this.persistenceManager.updateIndex(scraperTuple.urlSectionExtractorScraper.scrapingIndex);
         });
     }
 }

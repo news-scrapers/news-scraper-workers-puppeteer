@@ -11,7 +11,7 @@ yarn-error.log*
 config/scrapingConfig.json
 /config/scrapingConfig.json
 scrapingConfig.json
-
+database_news.sqlite3
 # Runtime data
 pids
 *.pid

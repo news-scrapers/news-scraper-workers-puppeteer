@@ -1,9 +1,6 @@
 import {
-    convertScrapingIndexSqlI, convertToScrapingIndexSqlI,
-    ScrapingIndex,
     ScrapingIndexDocument,
     ScrapingIndexI,
-    ScrapingIndexSql, ScrapingIndexSqlI
 } from './models/ScrapingIndex';
 
 import {ContentScraper} from "./scrapers/ContentScraper";
@@ -13,7 +10,6 @@ import {TheSunNewContentScraper} from "./scrapers/TheSunNewContentScraper";
 
 import mongoose from 'mongoose';
 import scrapingConfig from './config/scrapingConfigFull.json';
-import {convertToNewsScrapedSqlI, NewScraped, NewScrapedI, NewScrapedSql} from "./models/NewScraped";
 import {BBCNewIndexScraper} from "./scrapers/BBCNewIndexScraper";
 import {BBCNewContentScraper} from "./scrapers/BBCNewContentScraper";
 import {CnnNewContentScraper} from "./scrapers/CnnNewContentScraper";
@@ -22,7 +18,8 @@ import {GuardianNewContentScraper} from "./scrapers/GuardianNewContentScraper";
 import {GuardianNewIndexScraper} from "./scrapers/GuardianNewIndexScraper";
 import {UsatodayNewContentScraper} from "./scrapers/UsatodayNewContentScraper";
 import {UsatodayNewIndexScraper} from "./scrapers/UsatodayNewIndexScraper";
-import {initDb} from "./models";
+import {initDb} from "./models/sequelizeConfig";
+import PersistenceManager from "./PersistenceManager";
 
 require('dotenv').config();
 mongoose.connect(process.env["MONGODB_URL"], {useNewUrlParser: true, useUnifiedTopology: true});
@@ -38,11 +35,13 @@ export default class ScraperApp {
     public scrapers: ScraperTuple[] = [];
     public joiningStr = "===="
     public scrapingIndex: ScrapingIndexDocument;
-
+    public persistenceManager: PersistenceManager
     constructor() {
     }
 
     async loadIndexAndScrapers() {
+
+        this.persistenceManager = new PersistenceManager(this.config)
 
         for (let newspaper of this.config.newspapers) {
             console.log("loading index for " + newspaper)
@@ -105,13 +104,13 @@ export default class ScraperApp {
     }
 
     async prepareIndex(newspaper: string): Promise<ScrapingIndexI> {
-        let indexScraper = await this.findCurrentIndex(newspaper)
+        let indexScraper = await this.persistenceManager.findCurrentIndex(newspaper)
         if (!indexScraper || !indexScraper.scraperId) {
             console.log(indexScraper)
             indexScraper = this.loadIndexFromConfig(newspaper)
         }
 
-        await this.updateIndex(indexScraper)
+        await this.persistenceManager.updateIndex(indexScraper)
         return indexScraper
 
     }
@@ -159,7 +158,7 @@ export default class ScraperApp {
         if (scraperTuple.urlSectionExtractorScraper.scrapingIndex.pageNewIndex >= urls.length - 1) {
             console.log("RESETING_____________")
             scraperTuple.urlSectionExtractorScraper.scrapingIndex.pageNewIndex = 1
-            await this.updateIndex(scraperTuple.urlSectionExtractorScraper.scrapingIndex)
+            await this.persistenceManager.updateIndex(scraperTuple.urlSectionExtractorScraper.scrapingIndex)
         }
 
         while (scraperTuple.urlSectionExtractorScraper.scrapingIndex.pageNewIndex <= urls.length - 1) {
@@ -174,12 +173,12 @@ export default class ScraperApp {
 
                 let extractedNews = await scraperTuple.pageScraper.extractNewInUrl(url, scraperTuple.urlSectionExtractorScraper.scrapingIndex.scraperId)
                 console.log(extractedNews)
-                await this.saveNewsScraped(extractedNews)
+                await this.persistenceManager.saveNewsScraped(extractedNews)
 
             }
 
             scraperTuple.urlSectionExtractorScraper.scrapingIndex.pageNewIndex = scraperTuple.urlSectionExtractorScraper.scrapingIndex.pageNewIndex + 1
-            await this.updateIndex(scraperTuple.urlSectionExtractorScraper.scrapingIndex)
+            await this.persistenceManager.updateIndex(scraperTuple.urlSectionExtractorScraper.scrapingIndex)
 
         }
 
@@ -195,112 +194,8 @@ export default class ScraperApp {
             scraperTuple.urlSectionExtractorScraper.scrapingIndex.urlIndex = 0
         }
 
-        await this.updateIndex(scraperTuple.urlSectionExtractorScraper.scrapingIndex)
+        await this.persistenceManager.updateIndex(scraperTuple.urlSectionExtractorScraper.scrapingIndex)
     }
 
-
-
-    async updateIndex(index: ScrapingIndexI) {
-        const indexDb = Object.create(index)
-        const conditions = {
-            scraperId: indexDb.scraperId,
-            newspaper: indexDb.newspaper
-        }
-        indexDb.dateScraping = new Date()
-
-
-        if (this.config.useMongoDb) {
-            try {
-                await ScrapingIndex.findOneAndUpdate(conditions,
-                    indexDb, {upsert: true})
-            } catch (e) {
-                console.log("ERROR UPDATING INDEX mongo")
-                throw e
-            }
-        }
-
-        if (this.config.useSqliteDb) {
-            try {
-                const indexSql = convertToScrapingIndexSqlI(indexDb)
-
-                const found = await ScrapingIndexSql.findOne({where: conditions})
-                if (found) {
-                    await ScrapingIndexSql.update(indexSql, {where: conditions})
-                } else {
-                    await ScrapingIndexSql.create(indexSql)
-                }
-            } catch (e) {
-                console.log("ERROR UPDATING INDEX sqlite")
-                throw e
-            }
-        }
-
-    }
-
-    async findCurrentIndex(newspaper: string): Promise<ScrapingIndexI> {
-        const conditions = {
-            //scraperId: this.config.scraperId,
-            newspaper: newspaper
-        }
-        if (this.config.useSqliteDb) {
-            try {
-                const scrapingIndexDocumentM = await ScrapingIndexSql.findOne({where: conditions})
-                if (scrapingIndexDocumentM) {
-                    const index = convertScrapingIndexSqlI(scrapingIndexDocumentM.toJSON() as ScrapingIndexSqlI)
-                    return index
-                }
-                return null
-            } catch (e) {
-                console.log("error saving using sqlite")
-                throw e
-            }
-
-        }
-
-        if (this.config.useMongoDb) {
-            try {
-                let scrapingIndexDocument = await ScrapingIndex.findOne(conditions).exec();
-
-                if (scrapingIndexDocument) {
-                    return scrapingIndexDocument.toObject()
-                } else return null
-            } catch (e) {
-                console.log("error saving using mongodb")
-                throw e
-            }
-
-        }
-    }
-
-    async saveNewsScraped(newItem: NewScrapedI) {
-
-        const conditions = {url: newItem.url}
-        if (this.config.useSqliteDb) {
-            try {
-                const newsSql = convertToNewsScrapedSqlI(newItem)
-                const found = await NewScrapedSql.findOne({where: conditions})
-                if (found) {
-                    await NewScrapedSql.update(newsSql, {where: conditions})
-                } else {
-                    await NewScrapedSql.create(newsSql)
-                }
-            } catch (e) {
-                console.log("ERROR SAVING sqlite")
-                throw e
-            }
-        }
-
-        if (this.config.useMongoDb) {
-            try {
-                const scrapingIndexDocument = await NewScraped.findOneAndUpdate(conditions,
-                    newItem, {upsert: true})
-
-            } catch (e) {
-                console.log("ERROR SAVING mongo")
-                throw e
-            }
-        }
-
-    }
 
 } 
