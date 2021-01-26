@@ -3,6 +3,7 @@ import {TheSunNewIndexScraper} from "../src/scrapers/TheSunNewIndexScraper";
 import {ScrapingIndexI} from "../src/models/ScrapingIndex";
 import {BBCNewIndexScraper} from "../src/scrapers/BBCNewIndexScraper";
 import {CnnNewIndexScraper} from "../src/scrapers/CnnNewIndexScraper";
+import {NewYorkTimesIndexScraper} from "../src/scrapers/NewYorkTimesIndexScraper";
 
 require('dotenv').config();
 
@@ -14,7 +15,7 @@ describe('the nyt index new scraper', function () {
                 ["https://www.nytimes.com/section/climate",]
         } as ScrapingIndexI
 
-        const scraper = new CnnNewIndexScraper(testIndex);
+        const scraper = new NewYorkTimesIndexScraper(testIndex);
         scraper.maxPages=1
         jest.setTimeout(59999)
 

@@ -9,6 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.CnnNewIndexScraper = void 0;
 const IndexScraper_1 = require("./IndexScraper");
 class CnnNewIndexScraper extends IndexScraper_1.IndexScraper {
     constructor(scrapingIndex) {

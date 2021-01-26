@@ -12,6 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.ElPaisNewContentScraper = void 0;
 const PuppeteerScraper_1 = require("./PuppeteerScraper");
 const html_to_text_1 = __importDefault(require("html-to-text"));
 class ElPaisNewContentScraper extends PuppeteerScraper_1.PuppeteerScraper {
@@ -29,7 +30,12 @@ class ElPaisNewContentScraper extends PuppeteerScraper_1.PuppeteerScraper {
             console.log("---");
             yield this.initializePuppeteer();
             try {
-                yield this.page.goto(url, { waitUntil: 'load', timeout: 0 });
+                try {
+                    yield this.page.goto(url, { waitUntil: 'load', timeout: 0 });
+                }
+                catch (e) {
+                    return {};
+                }
                 yield this.page.waitFor(this.timeWaitStart);
                 const div = yield this.page.$('div.articulo__interior');
                 const headline = yield this.extractHeadline(div);

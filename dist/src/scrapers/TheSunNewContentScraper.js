@@ -9,6 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.TheSunNewContentScraper = void 0;
 const ContentScraper_1 = require("./ContentScraper");
 const uuid_1 = require("uuid");
 class TheSunNewContentScraper extends ContentScraper_1.ContentScraper {
@@ -31,7 +32,12 @@ class TheSunNewContentScraper extends ContentScraper_1.ContentScraper {
             console.log("---");
             yield this.initializePuppeteer();
             try {
-                yield this.page.goto(url, { waitUntil: 'load', timeout: 0 });
+                try {
+                    yield this.page.goto(url, { waitUntil: 'load', timeout: 0 });
+                }
+                catch (e) {
+                    return {};
+                }
                 yield this.page.waitFor(this.timeWaitStart);
                 yield this.clickOkButtonCookie();
                 const div = yield this.page.$('div.article-switcheroo');

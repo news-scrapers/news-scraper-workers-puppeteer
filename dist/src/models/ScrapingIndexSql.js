@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.obtainScrapingIUrlsSqlI = exports.convertScrapingIndexSqlI = exports.convertToScrapingIndexSqlI = exports.ScrapingIndexSql = exports.joiningStrUrls = exports.scrapingIndexSqlAttributes = void 0;
 const sequelize_1 = require("sequelize");
 exports.scrapingIndexSqlAttributes = {
     id: {
@@ -42,7 +43,7 @@ exports.joiningStrUrls = "=====";
 class ScrapingIndexSql extends sequelize_1.Model {
 }
 exports.ScrapingIndexSql = ScrapingIndexSql;
-exports.convertToScrapingIndexSqlI = (index) => {
+const convertToScrapingIndexSqlI = (index) => {
     const indexSql = index;
     if (indexSql.startingUrls && Array.isArray(indexSql.startingUrls)) {
         const urls = indexSql.startingUrls;
@@ -50,13 +51,15 @@ exports.convertToScrapingIndexSqlI = (index) => {
     }
     return indexSql;
 };
-exports.convertScrapingIndexSqlI = (indexSql, scrapingUrls) => {
+exports.convertToScrapingIndexSqlI = convertToScrapingIndexSqlI;
+const convertScrapingIndexSqlI = (indexSql, scrapingUrls) => {
     const index = indexSql;
     const urls = scrapingUrls.map(url => url.url);
     index.startingUrls = urls;
     return index;
 };
-exports.obtainScrapingIUrlsSqlI = (index) => {
+exports.convertScrapingIndexSqlI = convertScrapingIndexSqlI;
+const obtainScrapingIUrlsSqlI = (index) => {
     return index.startingUrls.map(url => {
         const scrapingUrl = {};
         scrapingUrl.url = url;
@@ -65,4 +68,5 @@ exports.obtainScrapingIUrlsSqlI = (index) => {
         return scrapingUrl;
     });
 };
+exports.obtainScrapingIUrlsSqlI = obtainScrapingIUrlsSqlI;
 //# sourceMappingURL=ScrapingIndexSql.js.map

@@ -12,6 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.PuppeteerScraper = void 0;
 const puppeteer_extra_1 = __importDefault(require("puppeteer-extra"));
 //import randomUA = require('modern-random-ua')
 const user_agents_1 = __importDefault(require("user-agents"));

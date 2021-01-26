@@ -29,7 +29,7 @@ export class PuppeteerScraper {
         //puppeteer.use(AdblockerPlugin({ blockTrackers: true }))
 
         this.browser = await puppeteer.use(StealthPlugin()).launch({
-            headless: false,
+            headless: true,
             ignoreHTTPSErrors: true,
             slowMo: 0,
             args: ['--window-size=1400,900',

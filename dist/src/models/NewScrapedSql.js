@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.convertNewsScrapedSqlI = exports.convertToNewsScrapedSqlI = exports.joiningStrtags = exports.newScrapedSqlAttributes = exports.NewScrapedSql = void 0;
 const sequelize_1 = require("sequelize");
 class NewScrapedSql extends sequelize_1.Model {
 }
@@ -41,7 +42,7 @@ exports.newScrapedSqlAttributes = {
     }
 };
 exports.joiningStrtags = ",";
-exports.convertToNewsScrapedSqlI = (newScrapedI) => {
+const convertToNewsScrapedSqlI = (newScrapedI) => {
     const newScrapedSql = newScrapedI;
     if (newScrapedSql.tags && Array.isArray(newScrapedSql.tags)) {
         const tags = newScrapedSql.tags;
@@ -49,7 +50,8 @@ exports.convertToNewsScrapedSqlI = (newScrapedI) => {
     }
     return newScrapedSql;
 };
-exports.convertNewsScrapedSqlI = (newScrapedSqlI) => {
+exports.convertToNewsScrapedSqlI = convertToNewsScrapedSqlI;
+const convertNewsScrapedSqlI = (newScrapedSqlI) => {
     const index = newScrapedSqlI;
     if (newScrapedSqlI.tags.includes(exports.joiningStrtags)) {
         const tags = newScrapedSqlI.tags;
@@ -57,4 +59,5 @@ exports.convertNewsScrapedSqlI = (newScrapedSqlI) => {
     }
     return index;
 };
+exports.convertNewsScrapedSqlI = convertNewsScrapedSqlI;
 //# sourceMappingURL=NewScrapedSql.js.map

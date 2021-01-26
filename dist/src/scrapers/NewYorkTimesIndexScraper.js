@@ -9,9 +9,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UsatodayNewIndexScraper = void 0;
+exports.NewYorkTimesIndexScraper = void 0;
 const IndexScraper_1 = require("./IndexScraper");
-class UsatodayNewIndexScraper extends IndexScraper_1.IndexScraper {
+class NewYorkTimesIndexScraper extends IndexScraper_1.IndexScraper {
     constructor(scrapingIndex) {
         super();
         this.urls = [];
@@ -27,10 +27,15 @@ class UsatodayNewIndexScraper extends IndexScraper_1.IndexScraper {
                 this.scrapingIndex.urlIndex = 0;
                 this.scrapingIndex.pageNewIndex = 1;
             }
-            const currentUrl = this.scrapingIndex.startingUrls[this.scrapingIndex.urlIndex];
-            const extractedUrls = yield this.extractUrlsFromStartingUrl(currentUrl);
-            const uniqUrls = [...new Set(extractedUrls)];
-            return uniqUrls;
+            try {
+                const currentUrl = this.scrapingIndex.startingUrls[this.scrapingIndex.urlIndex];
+                const extractedUrls = yield this.extractUrlsFromStartingUrl(currentUrl);
+                const uniqUrls = [...new Set(extractedUrls)];
+                return uniqUrls;
+            }
+            catch (e) {
+                return [];
+            }
         });
     }
     extractUrlsFromStartingUrl(url) {
@@ -58,7 +63,7 @@ class UsatodayNewIndexScraper extends IndexScraper_1.IndexScraper {
             yield this.initializePuppeteer();
             try {
                 yield this.page.goto(pageUrl, { waitUntil: 'load', timeout: 0 });
-                yield this.page.waitFor(this.timeWaitStart);
+                yield this.scrollToButton();
                 const urlsInPage = yield this.extractUrlsFromPage();
                 yield this.browser.close();
                 yield this.page.waitFor(this.timeWaitStart);
@@ -85,13 +90,25 @@ class UsatodayNewIndexScraper extends IndexScraper_1.IndexScraper {
     extractUrlsFromPage() {
         return __awaiter(this, void 0, void 0, function* () {
             let hrefs = yield this.page.$$eval('a', (as) => as.map((a) => a.href));
-            const date_regex = /\/(\d{4})\//;
+            const date_regex = /(\d{4})([\/-])(\d{1,2})\2(\d{1,2})/;
             //hrefs = ["https://edition.cnn.com/2020/12/24/media/biden-trump-media/index.html"]
             return hrefs.filter((href) => {
-                return date_regex.test(href) && !href.includes("www.facebook.com") && href.includes("eu.usatoday.com");
+                return date_regex.test(href) && !href.includes("/videos/");
             });
         });
     }
+    scrollToButton() {
+        return __awaiter(this, void 0, void 0, function* () {
+            for (let i = 1; i <= 8; i++) {
+                yield this.page.evaluate(() => __awaiter(this, void 0, void 0, function* () {
+                    window.scrollBy(0, 500);
+                }));
+                const factor = Math.random() * 0.5;
+                yield this.page.waitFor(this.timeWaitStart * factor);
+                console.log("scrolling down " + i);
+            }
+        });
+    }
 }
-exports.UsatodayNewIndexScraper = UsatodayNewIndexScraper;
-//# sourceMappingURL=UsatodayNewIndexScraper.js.map
+exports.NewYorkTimesIndexScraper = NewYorkTimesIndexScraper;
+//# sourceMappingURL=NewYorkTimesIndexScraper.js.map

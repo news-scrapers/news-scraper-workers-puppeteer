@@ -24,10 +24,15 @@ export class NewYorkTimesIndexScraper extends IndexScraper {
             this.scrapingIndex.urlIndex = 0
             this.scrapingIndex.pageNewIndex= 1
         }
-        const currentUrl = this.scrapingIndex.startingUrls[this.scrapingIndex.urlIndex]
-        const extractedUrls = await this.extractUrlsFromStartingUrl(currentUrl)
-        const uniqUrls = [...new Set(extractedUrls)];
-        return uniqUrls
+        try {
+            const currentUrl = this.scrapingIndex.startingUrls[this.scrapingIndex.urlIndex]
+            const extractedUrls = await this.extractUrlsFromStartingUrl(currentUrl)
+            const uniqUrls = [...new Set(extractedUrls)];
+            return uniqUrls
+        } catch (e) {
+           return []
+        }
+
     }
 
     async extractUrlsFromStartingUrl(url: string): Promise<string[]> {
@@ -57,16 +62,8 @@ export class NewYorkTimesIndexScraper extends IndexScraper {
 
         try {
             await this.page.goto(pageUrl, {waitUntil: 'load', timeout: 0});
-            await this.page.waitFor(this.timeWaitStart);
 
-            await this.page.evaluate(async () => {
-                window.scrollBy(0, 100);
-                window.scrollBy(0, 100);
-                window.scrollBy(0, 100);
-                window.scrollBy(0, 100);
-                window.scrollBy(0, 100);
-            })
-
+            await this.scrollToButton()
 
             const urlsInPage = await  this.extractUrlsFromPage();
 
@@ -101,6 +98,19 @@ export class NewYorkTimesIndexScraper extends IndexScraper {
         return hrefs.filter((href: string) => {
             return date_regex.test(href) && !href.includes("/videos/")
         })
+    }
+
+    async scrollToButton(){
+
+        for (let i = 1; i<=8; i++) {
+            await this.page.evaluate(async () => {
+                window.scrollBy(0, 500);
+            })
+            const factor = Math.random()*0.5
+            await this.page.waitFor(this.timeWaitStart * factor);
+            console.log("scrolling down " + i)
+        }
+
     }
 
 }

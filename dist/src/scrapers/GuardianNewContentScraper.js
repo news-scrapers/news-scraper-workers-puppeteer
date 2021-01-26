@@ -9,6 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.GuardianNewContentScraper = void 0;
 const ContentScraper_1 = require("./ContentScraper");
 const uuid_1 = require("uuid");
 class GuardianNewContentScraper extends ContentScraper_1.ContentScraper {
@@ -37,7 +38,12 @@ class GuardianNewContentScraper extends ContentScraper_1.ContentScraper {
                 console.log("error initializing");
             }
             try {
-                yield this.page.goto(url, { waitUntil: 'load', timeout: 0 });
+                try {
+                    yield this.page.goto(url, { waitUntil: 'load', timeout: 0 });
+                }
+                catch (e) {
+                    return {};
+                }
                 const div = yield this.page.$('div.pg-rail-tall__body');
                 const [headline, content, date, author, image, tags] = yield Promise.all([this.extractHeadline(), this.extractBody(div), this.extractDate(), this.extractAuthor(), this.extractImage(), this.extractTags()]);
                 yield this.browser.close();
