@@ -33,10 +33,20 @@ export class CnnNewContentScraper extends ContentScraper {
             console.log("error initializing")
         }
         try {
-            await this.page.goto(url, {waitUntil: 'load', timeout: 0});
+            console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+
+            try {
+                await this.page.goto(url, {waitUntil: 'load', timeout: 0});
+            } catch (e){
+                return {} as NewScrapedI
+            }
+
 
             const div = await this.page.$('div.pg-rail-tall__body');
+            console.log("333333333333333333333333333333333333333333333333333")
+
             const [headline, content, date, author, image, tags] = await Promise.all([this.extractHeadline(), this.extractBody(div), this.extractDate(), this.extractAuthor(), this.extractImage(), this.extractTags()])
+            console.log("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB")
 
             await this.browser.close();
             await this.page.waitFor(this.timeWaitStart);
@@ -45,6 +55,7 @@ export class CnnNewContentScraper extends ContentScraper {
             return results;
 
         } catch (err) {
+            console.log("CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC")
             console.log(err);
             await this.page.screenshot({ path: 'error_extract_new.png' });
             await this.browser.close();

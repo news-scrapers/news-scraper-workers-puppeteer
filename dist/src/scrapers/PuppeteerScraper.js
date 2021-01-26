@@ -12,7 +12,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.PuppeteerScraper = void 0;
 const puppeteer_extra_1 = __importDefault(require("puppeteer-extra"));
 //import randomUA = require('modern-random-ua')
 const user_agents_1 = __importDefault(require("user-agents"));
@@ -40,6 +39,13 @@ class PuppeteerScraper {
                     '--disable-gpu', "--disable-features=IsolateOrigins,site-per-process", '--blink-settings=imagesEnabled=false']
             });
             this.page = yield this.browser.newPage();
+            this.page.on('error', err => {
+                if (!this.page.isClosed()) {
+                    //Close page if not closed already
+                    this.page.close();
+                }
+                console.log("----");
+            });
             yield this.page.setUserAgent(userAgent.toString());
             function handleClose(msg) {
                 console.log(msg);
@@ -49,9 +55,6 @@ class PuppeteerScraper {
             }
             process.on("uncaughtException", () => {
                 //handleClose(`I crashed`);
-            });
-            process.on("unhandledRejection", () => {
-                handleClose(`I was rejected`);
             });
         });
     }

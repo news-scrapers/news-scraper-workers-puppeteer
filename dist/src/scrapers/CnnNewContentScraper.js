@@ -9,7 +9,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CnnNewContentScraper = void 0;
 const ContentScraper_1 = require("./ContentScraper");
 const uuid_1 = require("uuid");
 class CnnNewContentScraper extends ContentScraper_1.ContentScraper {
@@ -38,15 +37,24 @@ class CnnNewContentScraper extends ContentScraper_1.ContentScraper {
                 console.log("error initializing");
             }
             try {
-                yield this.page.goto(url, { waitUntil: 'load', timeout: 0 });
+                console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+                try {
+                    yield this.page.goto(url, { waitUntil: 'load', timeout: 0 });
+                }
+                catch (e) {
+                    return {};
+                }
                 const div = yield this.page.$('div.pg-rail-tall__body');
+                console.log("333333333333333333333333333333333333333333333333333");
                 const [headline, content, date, author, image, tags] = yield Promise.all([this.extractHeadline(), this.extractBody(div), this.extractDate(), this.extractAuthor(), this.extractImage(), this.extractTags()]);
+                console.log("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
                 yield this.browser.close();
                 yield this.page.waitFor(this.timeWaitStart);
                 let results = { id: uuid_1.v4(), url, content, headline, tags, date, image, author, scraperId: this.scraperId, newspaper: this.newspaper, scrapedAt: new Date() };
                 return results;
             }
             catch (err) {
+                console.log("CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC");
                 console.log(err);
                 yield this.page.screenshot({ path: 'error_extract_new.png' });
                 yield this.browser.close();

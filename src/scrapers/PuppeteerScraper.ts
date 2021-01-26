@@ -39,6 +39,15 @@ export class PuppeteerScraper {
         });
         
         this.page = await this.browser.newPage();
+
+        this.page.on('error', err => {
+            if (!this.page.isClosed()) {
+                //Close page if not closed already
+                this.page.close();
+            }
+            console.log("----")
+        })
+
         await this.page.setUserAgent(userAgent.toString())
 
         function handleClose(msg:any){
@@ -52,9 +61,6 @@ export class PuppeteerScraper {
             //handleClose(`I crashed`);
         });
 
-        process.on("unhandledRejection", () => {
-            handleClose(`I was rejected`);
-        });
 
     }
 
