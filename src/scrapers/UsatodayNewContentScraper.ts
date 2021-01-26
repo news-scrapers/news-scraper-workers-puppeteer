@@ -28,9 +28,11 @@ export class UsatodayNewContentScraper extends ContentScraper {
         await this.initializePuppeteer();
 
         try {
-            await this.page.goto(url, { waitUntil: "networkidle2" });
-            //await this.clickOkButtonCookie()
-            
+            try {
+                await this.page.goto(url, {waitUntil: 'load', timeout: 0});
+            } catch (e){
+                return {} as NewScrapedI
+            }
 
             const [content, headline, author, date] = await Promise.all([this.extractBody(),this.extractHeadline(), this.extractAuthor(), this.extractDate()])
 

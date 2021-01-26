@@ -29,7 +29,11 @@ export class TheSunNewContentScraper extends ContentScraper {
         await this.initializePuppeteer();
 
         try {
-            await this.page.goto(url, {waitUntil: 'load', timeout: 0});
+            try {
+                await this.page.goto(url, {waitUntil: 'load', timeout: 0});
+            } catch (e){
+                return {} as NewScrapedI
+            }
             await this.page.waitFor(this.timeWaitStart);
             await this.clickOkButtonCookie()
             

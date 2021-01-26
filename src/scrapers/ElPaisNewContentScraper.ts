@@ -1,5 +1,6 @@
 import  {PuppeteerScraper} from './PuppeteerScraper'
 import htmlToText from 'html-to-text'
+import {NewScrapedI} from "../models/NewScraped";
 
 export class ElPaisNewContentScraper extends PuppeteerScraper {
     public timeWaitStart: number
@@ -20,7 +21,11 @@ export class ElPaisNewContentScraper extends PuppeteerScraper {
         await this.initializePuppeteer();
 
         try {
-            await this.page.goto(url, {waitUntil: 'load', timeout: 0});
+            try {
+                await this.page.goto(url, {waitUntil: 'load', timeout: 0});
+            } catch (e){
+                return {} as NewScrapedI
+            }
             await this.page.waitFor(this.timeWaitStart);
 
             const div = await this.page.$('div.articulo__interior');

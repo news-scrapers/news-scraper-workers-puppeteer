@@ -33,7 +33,11 @@ export class GuardianNewContentScraper extends ContentScraper {
             console.log("error initializing")
         }
         try {
-            await this.page.goto(url, {waitUntil: 'load', timeout: 0});
+            try {
+                await this.page.goto(url, {waitUntil: 'load', timeout: 0});
+            } catch (e){
+                return {} as NewScrapedI
+            }
 
             const div = await this.page.$('div.pg-rail-tall__body');
             const [headline, content, date, author, image, tags] = await Promise.all([this.extractHeadline(), this.extractBody(div), this.extractDate(), this.extractAuthor(), this.extractImage(), this.extractTags()])

@@ -5,13 +5,12 @@ import {ScrapingIndexI} from "../models/ScrapingIndex";
 import {ContentScraper} from "./ContentScraper";
 import {v4} from 'uuid'
 
-export class CnnNewContentScraper extends ContentScraper {
+export class NewYorkTimesContentScraper extends ContentScraper {
     public timeWaitStart: number
     public timeWaitClick: number
     public newspaper: string
     public scraperId: string
-    public excludedParagraphs = ["Please include a contact number if you are willing to speak to a BBC journalist", "If you are reading this page and can't see the form" ]
-
+    public excludedParagraphs = ["Supported by··", "Advertisement","Something went wrong. Please try again later", "We use cookies and similar methods to recognize visitors"]
     constructor(scraperId: string, newspaper:string) {
         super();
         this.newspaper = newspaper
@@ -21,7 +20,7 @@ export class CnnNewContentScraper extends ContentScraper {
     }
 
     async extractNewInUrl(url: string):Promise<NewScrapedI> {
-        // https://edition.cnn.com/2020/12/28/politics/donald-trump-covid-relief-bill/index.html
+        // https://www.nytimes.com/live/2021/01/26/us/biden-trump-impeachment
         console.log("\n---");
         console.log("extracting full new in url:")
         console.log(url);
@@ -43,7 +42,7 @@ export class CnnNewContentScraper extends ContentScraper {
 
             const div = await this.page.$('div.pg-rail-tall__body');
 
-            const [headline, content, date, author, image, tags] = await Promise.all([this.extractHeadline(), this.extractBody(div), this.extractDate(), this.extractAuthor(), this.extractImage(), this.extractTags()])
+            const [headline, content, date, author, image, tags] = await Promise.all([this.extractHeadline(), this.extractBody(), this.extractDate(), this.extractAuthor(), this.extractImage(), this.extractTags()])
 
             await this.browser.close();
             await this.page.waitFor(this.timeWaitStart);
@@ -59,9 +58,9 @@ export class CnnNewContentScraper extends ContentScraper {
         }
     }
 
-    async extractBody(div: any){
+    async extractBody(){
         try{
-            const pars = await this.page.$$("div.zn-body__paragraph")
+            const pars = await this.page.$$("p")
             let text = ''
             for (let par of pars) {
                 const textPar = await this.page.evaluate(element => element.textContent, par);
@@ -84,7 +83,7 @@ export class CnnNewContentScraper extends ContentScraper {
 
     async extractDate(): Promise<Date> {
         try {
-            const date = await this.page.$eval("head > meta[name='pubdate']", (element:any) => element.content);
+            const date = await this.page.$eval("head > meta[property='article:published_time']", (element:any) => element.content);
             return new Date(date)
         } catch (e) {
             return null
@@ -93,9 +92,9 @@ export class CnnNewContentScraper extends ContentScraper {
     }
     async extractTags(): Promise<string[]> {
         try{
-            let tags = await this.page.$eval("head > meta[name='section']", (element:any) => element.content);
-            if (tags && tags.includes(",")){
-                return tags.split(",").map((elem:string) => (elem.trim()))
+            let tags = await this.page.$eval("head > meta[name='news_keywords']", (element:any) => element.content);
+            if (tags && tags.includes(";")){
+                return tags.split(";").map((elem:string) => (elem.trim()))
             }
             return [tags]
         } catch (e) {
@@ -107,7 +106,7 @@ export class CnnNewContentScraper extends ContentScraper {
 
     async extractHeadline() {
         try{
-            let headline = await this.page.$eval("head > meta[property='og:title']", (element:any) => element.content);
+            let headline = await this.page.$eval("head > meta[property='twitter:title']", (element:any) => element.content);
             return headline
         } catch (e) {
             return null
