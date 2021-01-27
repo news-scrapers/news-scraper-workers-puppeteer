@@ -37,10 +37,10 @@ class UsatodayNewContentScraper extends ContentScraper_1.ContentScraper {
                 catch (e) {
                     return {};
                 }
-                const [content, headline, author, date] = yield Promise.all([this.extractBody(), this.extractHeadline(), this.extractAuthor(), this.extractDate()]);
+                const [content, headline, author, date, description] = yield Promise.all([this.extractBody(), this.extractHeadline(), this.extractAuthor(), this.extractDate(), this.extractDescription()]);
                 yield this.browser.close();
                 yield this.page.waitFor(this.timeWaitStart);
-                let results = { id: uuid_1.v4(), url, headline, content, date, author, scraperId: this.scraperId, newspaper: this.newspaper, scrapedAt: new Date() };
+                let results = { id: uuid_1.v4(), url, headline, content, date, author, description, scraperId: this.scraperId, newspaper: this.newspaper, scrapedAt: new Date() };
                 return results;
             }
             catch (err) {
@@ -74,6 +74,17 @@ class UsatodayNewContentScraper extends ContentScraper_1.ContentScraper {
             try {
                 const date = yield this.page.$eval("lit-timestamp", (element) => element);
                 return new Date(date.__publishDate);
+            }
+            catch (e) {
+                return null;
+            }
+        });
+    }
+    extractDescription() {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const description = yield this.page.$eval("head > meta[name='description']", (element) => element.content);
+                return description;
             }
             catch (e) {
                 return null;

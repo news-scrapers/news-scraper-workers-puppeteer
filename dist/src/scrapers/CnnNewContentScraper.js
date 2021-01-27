@@ -45,10 +45,23 @@ class CnnNewContentScraper extends ContentScraper_1.ContentScraper {
                     return {};
                 }
                 const div = yield this.page.$('div.pg-rail-tall__body');
-                const [headline, content, date, author, image, tags] = yield Promise.all([this.extractHeadline(), this.extractBody(div), this.extractDate(), this.extractAuthor(), this.extractImage(), this.extractTags()]);
+                const [headline, content, date, author, image, tags, description] = yield Promise.all([this.extractHeadline(), this.extractBody(div), this.extractDate(), this.extractAuthor(), this.extractImage(), this.extractTags(), this.extractDescription()]);
                 yield this.browser.close();
                 yield this.page.waitFor(this.timeWaitStart);
-                let results = { id: uuid_1.v4(), url, content, headline, tags, date, image, author, scraperId: this.scraperId, newspaper: this.newspaper, scrapedAt: new Date() };
+                let results = {
+                    id: uuid_1.v4(),
+                    url,
+                    content,
+                    headline,
+                    tags,
+                    date,
+                    image,
+                    author,
+                    description,
+                    scraperId: this.scraperId,
+                    newspaper: this.newspaper,
+                    scrapedAt: new Date()
+                };
                 return results;
             }
             catch (err) {
@@ -109,6 +122,17 @@ class CnnNewContentScraper extends ContentScraper_1.ContentScraper {
             try {
                 let headline = yield this.page.$eval("head > meta[property='og:title']", (element) => element.content);
                 return headline;
+            }
+            catch (e) {
+                return null;
+            }
+        });
+    }
+    extractDescription() {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const description = yield this.page.$eval("head > meta[property='og:description']", (element) => element.content);
+                return description;
             }
             catch (e) {
                 return null;

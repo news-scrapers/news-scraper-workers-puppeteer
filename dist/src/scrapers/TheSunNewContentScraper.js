@@ -41,10 +41,22 @@ class TheSunNewContentScraper extends ContentScraper_1.ContentScraper {
                 yield this.page.waitFor(this.timeWaitStart);
                 yield this.clickOkButtonCookie();
                 const div = yield this.page.$('div.article-switcheroo');
-                const [content, headline, tags, date] = yield Promise.all([this.extractBody(div), this.extractHeadline(div), this.extractTags(), this.extractDate()]);
+                const [content, headline, tags, date, description, image] = yield Promise.all([this.extractBody(div), this.extractHeadline(div), this.extractTags(), this.extractDate(), this.extractDescription(), this.extractImage()]);
                 yield this.browser.close();
                 yield this.page.waitFor(this.timeWaitStart);
-                let results = { id: uuid_1.v4(), url, headline, content, date, tags, scraperId: this.scraperId, newspaper: this.newspaper, scrapedAt: new Date() };
+                let results = {
+                    id: uuid_1.v4(),
+                    url,
+                    headline,
+                    content,
+                    date,
+                    tags,
+                    description,
+                    image,
+                    scraperId: this.scraperId,
+                    newspaper: this.newspaper,
+                    scrapedAt: new Date()
+                };
                 return results;
             }
             catch (err) {
@@ -79,6 +91,28 @@ class TheSunNewContentScraper extends ContentScraper_1.ContentScraper {
             try {
                 const date = yield this.page.$eval("head > meta[property='article:published_time']", (element) => element.content);
                 return new Date(date);
+            }
+            catch (e) {
+                return null;
+            }
+        });
+    }
+    extractDescription() {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const description = yield this.page.$eval("head > meta[property='og:description']", (element) => element.content);
+                return description;
+            }
+            catch (e) {
+                return null;
+            }
+        });
+    }
+    extractImage() {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const image = yield this.page.$eval("head > meta[property='og:image']", (element) => element.content);
+                return image;
             }
             catch (e) {
                 return null;
