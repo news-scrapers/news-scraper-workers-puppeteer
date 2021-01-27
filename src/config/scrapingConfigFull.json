@@ -15,6 +15,46 @@
     "thesunuk"
   ],
   "scrapingSettings": {
+    "latimes": {
+      "maxPages": 1,
+      "startingUrls": [
+        "https://www.latimes.com/",
+        "https://www.latimes.com/california",
+        "https://www.latimes.com/entertainment-arts",
+        "https://www.latimes.com/sports",
+        "https://www.latimes.com/food",
+        "https://www.latimes.com/environment",
+        "https://www.latimes.com/opinion",
+        "https://www.latimes.com/business/technology",
+        "https://www.latimes.com/business/real-estate",
+        "https://www.latimes.com/entertainment-arts/business",
+        "https://www.latimes.com/entertainment-arts/books",
+        "https://www.latimes.com/entertainment-arts/awards",
+        "https://www.latimes.com/topic/theater",
+        "https://www.latimes.com/topic/museums",
+        "https://www.latimes.com/topic/california-law-politics",
+        "https://www.latimes.com/topic/earthquakes",
+        "https://www.latimes.com/topic/education",
+        "https://www.latimes.com/homeless-housing",
+        "https://www.latimes.com/entertainment-arts/movies",
+        "https://www.latimes.com/entertainment-arts/tv",
+        "https://www.latimes.com/entertainment-arts/music",
+        "https://www.latimes.com/lifestyle",
+        "https://www.latimes.com/topic/fashion",
+        "https://www.latimes.com/food",
+        "https://www.latimes.com/topic/home-design",
+        "https://www.latimes.com/topic/la-affairs",
+        "https://www.latimes.com/topic/plants",
+        "https://www.latimes.com/topic/wellness",
+        "https://www.latimes.com/politics",
+        "https://www.latimes.com/science",
+        "https://www.latimes.com/sports",
+        "https://www.latimes.com/travel",
+        "https://www.latimes.com/world-nation",
+        "https://www.latimes.com/topic/immigration",
+        "https://www.latimes.com/topic/mexico-americas"
+      ]
+    },
     "newyorktimes": {
       "maxPages": 1,
       "startingUrls": [

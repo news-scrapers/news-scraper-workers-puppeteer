@@ -5,7 +5,7 @@ import {ScrapingIndexI} from "../models/ScrapingIndex";
 import {ContentScraper} from "./ContentScraper";
 import {v4} from 'uuid'
 
-export class NewYorkTimesContentScraper extends ContentScraper {
+export class LATimesContentScraper extends ContentScraper {
     public timeWaitStart: number
     public timeWaitClick: number
     public newspaper: string
@@ -38,16 +38,15 @@ export class NewYorkTimesContentScraper extends ContentScraper {
             } catch (e){
                 return {} as NewScrapedI
             }
-
-
-            const div = await this.page.$('div.pg-rail-tall__body');
-
-            const [headline, content, date, author, image, tags] = await Promise.all([this.extractHeadline(), this.extractBody(), this.extractDate(), this.extractAuthor(), this.extractImage(), this.extractTags()])
-
-            await this.browser.close();
             await this.page.waitFor(this.timeWaitStart);
 
-            let results = {id:v4(), url,content, headline, tags, date, image,author, scraperId:this.scraperId, newspaper:this.newspaper, scrapedAt:new Date()} as NewScrapedI
+            await this.click()
+
+            const [headline, content, date, author, image, tags, description] = await Promise.all([this.extractHeadline(), this.extractBody(), this.extractDate(), this.extractAuthor(), this.extractImage(), this.extractTags(), this.extractDescription()])
+
+            await this.browser.close();
+
+            let results = {id:v4(), url,content, headline, tags, date, image,author, description,scraperId:this.scraperId, newspaper:this.newspaper, scrapedAt:new Date()} as NewScrapedI
             return results;
 
         } catch (err) {
@@ -56,6 +55,28 @@ export class NewYorkTimesContentScraper extends ContentScraper {
             await this.browser.close();
             return null;
         }
+    }
+
+    async click(){
+        try {
+            const frames = await this.page.frames();
+            const tryItFrame = frames.find(f => f.name() === 'iframeResult');
+            for (const frame of frames) {
+                console.log(frame.name())
+                let [button] = await frame.$x("//button[contains(., 'Allow adds')]");
+                if (button) {
+                    await button.click();
+                }
+                [button] = await frame.$x("//button[contains(., 'Refresh page')]");
+                if (button) {
+                    //await button.click();
+                }
+            }
+
+        } catch (e) {
+            //console.log(e)
+        }
+
     }
 
     async extractBody(){
@@ -69,7 +90,7 @@ export class NewYorkTimesContentScraper extends ContentScraper {
             }
             return text
         } catch (e){
-            console.log(e)
+            //console.log(e)
             return null
         }
 
@@ -113,8 +134,18 @@ export class NewYorkTimesContentScraper extends ContentScraper {
 
     async extractHeadline() {
         try{
-            let headline = await this.page.$eval("head > meta[property='twitter:title']", (element:any) => element.content);
+            let headline = await this.page.$eval("head > meta[property='og:title']", (element:any) => element.content);
             return headline
+        } catch (e) {
+            return null
+        }
+
+    }
+
+    async extractDescription() {
+        try{
+            let description = await this.page.$eval("head > meta[property='og:description']", (element:any) => element.content);
+            return description
         } catch (e) {
             return null
         }
@@ -123,7 +154,7 @@ export class NewYorkTimesContentScraper extends ContentScraper {
 
     async extractAuthor() {
         try{
-            let headline = await this.page.$eval("head > meta[name='author']", (element:any) => element.content);
+            let headline = await this.page.$eval("head > meta[name='article:author']", (element:any) => element.content);
             return headline
         } catch (e) {
             return null

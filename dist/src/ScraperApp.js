@@ -28,6 +28,8 @@ const sequelizeConfig_1 = require("./models/sequelizeConfig");
 const PersistenceManager_1 = __importDefault(require("./PersistenceManager"));
 const NewYorkTimesContentScraper_1 = require("./scrapers/NewYorkTimesContentScraper");
 const NewYorkTimesIndexScraper_1 = require("./scrapers/NewYorkTimesIndexScraper");
+const LATimesContentScraper_1 = require("./scrapers/LATimesContentScraper");
+const LATimesIndexScraper_1 = require("./scrapers/LATimesIndexScraper");
 require('dotenv').config();
 mongoose_1.default.connect(process.env["MONGODB_URL"], { useNewUrlParser: true, useUnifiedTopology: true });
 class ScraperApp {
@@ -43,6 +45,15 @@ class ScraperApp {
             const newspapersReordered = this.reorderNewspaperArrayStartingWithLastScraped();
             for (let newspaper of newspapersReordered) {
                 console.log("loading index for " + newspaper);
+                if (newspaper === "latimes") {
+                    const indexScraper = yield this.prepareIndex(newspaper);
+                    console.log(indexScraper);
+                    const scraper = {
+                        pageScraper: new LATimesContentScraper_1.LATimesContentScraper(indexScraper.scraperId, indexScraper.newspaper),
+                        urlSectionExtractorScraper: new LATimesIndexScraper_1.LATimesIndexScraper(indexScraper)
+                    };
+                    this.scrapers.push(scraper);
+                }
                 if (newspaper === "newyorktimes") {
                     const indexScraper = yield this.prepareIndex(newspaper);
                     console.log(indexScraper);

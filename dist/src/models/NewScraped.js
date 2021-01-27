@@ -16,6 +16,7 @@ const newScrapedSchema = new mongoose_1.default.Schema({
     tags: Array(String),
     url: String,
     scraperId: String,
+    description: String,
     id: String
 }, { timestamps: true });
 exports.NewScraped = mongoose_1.default.model("NewScraped", newScrapedSchema);

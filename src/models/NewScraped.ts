@@ -15,6 +15,7 @@ const newScrapedSchema = new mongoose.Schema({
     tags: Array(String),
     url: String,
     scraperId: String,
+    description:String,
     id: String
 }, { timestamps: true });
 
@@ -26,6 +27,7 @@ export interface NewScrapedI {
     scrapedAt: Date
     content: string
     headline: string
+    description: string
     tags: string[]
     url: string
     scraperId: string

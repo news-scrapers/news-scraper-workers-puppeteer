@@ -23,6 +23,8 @@ import PersistenceManager from "./PersistenceManager";
 import {GlobalConfigI} from "./models/GlobalConfig";
 import {NewYorkTimesContentScraper} from "./scrapers/NewYorkTimesContentScraper";
 import {NewYorkTimesIndexScraper} from "./scrapers/NewYorkTimesIndexScraper";
+import {LATimesContentScraper} from "./scrapers/LATimesContentScraper";
+import {LATimesIndexScraper} from "./scrapers/LATimesIndexScraper";
 
 require('dotenv').config();
 mongoose.connect(process.env["MONGODB_URL"], {useNewUrlParser: true, useUnifiedTopology: true});
@@ -52,6 +54,16 @@ export default class ScraperApp {
 
         for (let newspaper of newspapersReordered) {
             console.log("loading index for " + newspaper)
+
+            if (newspaper === "latimes") {
+                const indexScraper = await this.prepareIndex(newspaper)
+                console.log(indexScraper)
+                const scraper = {
+                    pageScraper: new LATimesContentScraper(indexScraper.scraperId, indexScraper.newspaper),
+                    urlSectionExtractorScraper: new LATimesIndexScraper(indexScraper)
+                } as ScraperTuple
+                this.scrapers.push(scraper)
+            }
 
             if (newspaper === "newyorktimes") {
                 const indexScraper = await this.prepareIndex(newspaper)

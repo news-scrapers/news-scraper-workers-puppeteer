@@ -14,6 +14,7 @@ export class PuppeteerScraper {
     public pageHistoric: any;
     public api: any;
     public page: Page;
+    public newspaper:string;
 
     constructor() {
         this.browser = null;
@@ -24,10 +25,12 @@ export class PuppeteerScraper {
     }
 
     async initializePuppeteer() {
-        
+
         console.log("initializing puppeteer");
         //puppeteer.use(AdblockerPlugin({ blockTrackers: true }))
-
+        if (this.newspaper == "latimes") {
+            //puppeteer.use(AdblockerPlugin({ blockTrackers: true }))
+        }
         this.browser = await puppeteer.use(StealthPlugin()).launch({
             headless: true,
             ignoreHTTPSErrors: true,

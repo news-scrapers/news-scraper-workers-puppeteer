@@ -9,10 +9,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.NewYorkTimesContentScraper = void 0;
+exports.LATimesContentScraper = void 0;
 const ContentScraper_1 = require("./ContentScraper");
 const uuid_1 = require("uuid");
-class NewYorkTimesContentScraper extends ContentScraper_1.ContentScraper {
+class LATimesContentScraper extends ContentScraper_1.ContentScraper {
     constructor(scraperId, newspaper) {
         super();
         this.excludedParagraphs = ['Supported by', "Advertisement", "Something went wrong. Please try again later", "We use cookies and similar methods to recognize visitors"];
@@ -52,11 +52,11 @@ class NewYorkTimesContentScraper extends ContentScraper_1.ContentScraper {
                 catch (e) {
                     return {};
                 }
-                const div = yield this.page.$('div.pg-rail-tall__body');
-                const [headline, content, date, author, image, tags] = yield Promise.all([this.extractHeadline(), this.extractBody(), this.extractDate(), this.extractAuthor(), this.extractImage(), this.extractTags()]);
-                yield this.browser.close();
                 yield this.page.waitFor(this.timeWaitStart);
-                let results = { id: uuid_1.v4(), url, content, headline, tags, date, image, author, scraperId: this.scraperId, newspaper: this.newspaper, scrapedAt: new Date() };
+                yield this.click();
+                const [headline, content, date, author, image, tags, description] = yield Promise.all([this.extractHeadline(), this.extractBody(), this.extractDate(), this.extractAuthor(), this.extractImage(), this.extractTags(), this.extractDescription()]);
+                yield this.browser.close();
+                let results = { id: uuid_1.v4(), url, content, headline, tags, date, image, author, description, scraperId: this.scraperId, newspaper: this.newspaper, scrapedAt: new Date() };
                 return results;
             }
             catch (err) {
@@ -64,6 +64,28 @@ class NewYorkTimesContentScraper extends ContentScraper_1.ContentScraper {
                 yield this.page.screenshot({ path: 'error_extract_new.png' });
                 yield this.browser.close();
                 return null;
+            }
+        });
+    }
+    click() {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const frames = yield this.page.frames();
+                const tryItFrame = frames.find(f => f.name() === 'iframeResult');
+                for (const frame of frames) {
+                    console.log(frame.name());
+                    let [button] = yield frame.$x("//button[contains(., 'Allow adds')]");
+                    if (button) {
+                        yield button.click();
+                    }
+                    [button] = yield frame.$x("//button[contains(., 'Refresh page')]");
+                    if (button) {
+                        //await button.click();
+                    }
+                }
+            }
+            catch (e) {
+                //console.log(e)
             }
         });
     }
@@ -79,7 +101,7 @@ class NewYorkTimesContentScraper extends ContentScraper_1.ContentScraper {
                 return text;
             }
             catch (e) {
-                console.log(e);
+                //console.log(e)
                 return null;
             }
         });
@@ -112,8 +134,19 @@ class NewYorkTimesContentScraper extends ContentScraper_1.ContentScraper {
     extractHeadline() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                let headline = yield this.page.$eval("head > meta[property='twitter:title']", (element) => element.content);
+                let headline = yield this.page.$eval("head > meta[property='og:title']", (element) => element.content);
                 return headline;
+            }
+            catch (e) {
+                return null;
+            }
+        });
+    }
+    extractDescription() {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                let description = yield this.page.$eval("head > meta[property='og:description']", (element) => element.content);
+                return description;
             }
             catch (e) {
                 return null;
@@ -123,7 +156,7 @@ class NewYorkTimesContentScraper extends ContentScraper_1.ContentScraper {
     extractAuthor() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                let headline = yield this.page.$eval("head > meta[name='author']", (element) => element.content);
+                let headline = yield this.page.$eval("head > meta[name='article:author']", (element) => element.content);
                 return headline;
             }
             catch (e) {
@@ -153,5 +186,5 @@ class NewYorkTimesContentScraper extends ContentScraper_1.ContentScraper {
         });
     }
 }
-exports.NewYorkTimesContentScraper = NewYorkTimesContentScraper;
-//# sourceMappingURL=NewYorkTimesContentScraper.js.map
+exports.LATimesContentScraper = LATimesContentScraper;
+//# sourceMappingURL=LATimesContentScraper.js.map

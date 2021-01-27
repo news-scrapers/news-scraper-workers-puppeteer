@@ -32,6 +32,9 @@ export const newScrapedSqlAttributes = {
     author: {
         type: DataTypes.STRING,
     },
+    description: {
+        type: DataTypes.STRING,
+    },
     image: {
         type: DataTypes.STRING,
     },
