@@ -1,4 +1,4 @@
-import  {PuppeteerScraper} from './PuppeteerScraper'
+import {PuppeteerScraper} from './PuppeteerScraper'
 import htmlToText from 'html-to-text'
 import {ScrapingIndexI} from "../models/ScrapingIndex";
 import {IndexScraper} from "./IndexScraper";
@@ -8,7 +8,7 @@ export class LATimesIndexScraper extends IndexScraper {
     public timeWaitClick: number
     public maxPages: number
     public scrapingIndex: ScrapingIndexI
-    public urls:string[] = []
+    public urls: string[] = []
 
     constructor(scrapingIndex: ScrapingIndexI) {
         super();
@@ -19,11 +19,11 @@ export class LATimesIndexScraper extends IndexScraper {
         this.maxPages = scrapingIndex.maxPages
     }
 
-    async extractNewsUrlsInSectionPageFromIndexOneIteration (): Promise<string[]> {
+    async extractNewsUrlsInSectionPageFromIndexOneIteration(): Promise<string[]> {
         this.scrapingIndex.pageIndexSection = 1
-        if (this.scrapingIndex.urlIndex > this.scrapingIndex.startingUrls.length -1 ){
+        if (this.scrapingIndex.urlIndex > this.scrapingIndex.startingUrls.length - 1) {
             this.scrapingIndex.urlIndex = 0
-            this.scrapingIndex.pageNewIndex= 1
+            this.scrapingIndex.pageNewIndex = 1
         }
         try {
             const currentUrl = this.scrapingIndex.startingUrls[this.scrapingIndex.urlIndex]
@@ -31,24 +31,24 @@ export class LATimesIndexScraper extends IndexScraper {
             const uniqUrls = [...new Set(extractedUrls)];
             return uniqUrls
         } catch (e) {
-           return []
+            return []
         }
 
     }
 
     async extractUrlsFromStartingUrl(url: string): Promise<string[]> {
-            try {
-                const urls = await this.extractUrlsInPage(url)
-                this.urls = this.urls.concat(urls)
-            } catch (e) {
-                console.log(e)
-                return this.urls
-            }
+        try {
+            const urls = await this.extractUrlsInPage(url)
+            this.urls = this.urls.concat(urls)
+        } catch (e) {
+            console.log(e)
+            return this.urls
+        }
 
         return this.urls
     }
 
-    async extractUrlsInPage (url: string):Promise<string[]>{
+    async extractUrlsInPage(url: string): Promise<string[]> {
         // https://www.thesun.co.uk/tv/page/1/
         const pageUrl = url
 
@@ -66,7 +66,7 @@ export class LATimesIndexScraper extends IndexScraper {
 
             await this.scrollToButtonClickNext()
 
-            const urlsInPage = await  this.extractUrlsFromPage();
+            const urlsInPage = await this.extractUrlsFromPage();
 
             await this.browser.close();
             await this.page.waitFor(this.timeWaitStart);
@@ -75,15 +75,15 @@ export class LATimesIndexScraper extends IndexScraper {
 
         } catch (err) {
             console.log(err);
-            await this.page.screenshot({ path: 'error_extract_new.png' });
+            await this.page.screenshot({path: 'error_extract_new.png'});
             await this.browser.close();
             throw err
         }
     }
 
 
-    async extractUrlsFromPage(): Promise<string[]>{
-        let hrefs = await this.page.$$eval('a', (as:any) => as.map((a:any) => a.href));
+    async extractUrlsFromPage(): Promise<string[]> {
+        let hrefs = await this.page.$$eval('a', (as: any) => as.map((a: any) => a.href));
         const date_regex = /\d{4}-\d{2}-\d{2}/
 
         //hrefs = ["https://edition.cnn.com/2020/12/24/media/biden-trump-media/index.html"]
@@ -93,14 +93,14 @@ export class LATimesIndexScraper extends IndexScraper {
         })
     }
 
-    async scrollToButtonClickNext(){
+    async scrollToButtonClickNext() {
 
-        for (let i = 1; i<=18; i++) {
+        for (let i = 1; i <= 2; i++) {
             try {
-                //await this.page.evaluate( () => {
-                 //   window.scrollBy(0, 1000);
-                //})
-            }catch (e) {
+                await this.page.evaluate(() => {
+                    window.scrollBy(0, 1000);
+                })
+            } catch (e) {
                 //console.log(e)
             }
 
@@ -112,7 +112,7 @@ export class LATimesIndexScraper extends IndexScraper {
             console.log("scrolling down " + i)
             console.log("clicking down " + i)
 
-            const factor = Math.random()*0.5
+            const factor = Math.random() * 0.5
             await this.page.waitFor(this.timeWaitStart * factor);
         }
 

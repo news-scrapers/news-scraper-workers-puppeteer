@@ -5,6 +5,7 @@
     "useSqliteDb": true,
     "useMongoDb": true,
     "newspapers": [
+        "latimes",
         "newyorktimes",
         "usatoday",
         "guardianus",

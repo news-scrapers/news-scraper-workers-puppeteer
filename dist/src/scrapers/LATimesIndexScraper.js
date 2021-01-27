@@ -90,11 +90,11 @@ class LATimesIndexScraper extends IndexScraper_1.IndexScraper {
     }
     scrollToButtonClickNext() {
         return __awaiter(this, void 0, void 0, function* () {
-            for (let i = 1; i <= 18; i++) {
+            for (let i = 1; i <= 2; i++) {
                 try {
-                    //await this.page.evaluate( () => {
-                    //   window.scrollBy(0, 1000);
-                    //})
+                    yield this.page.evaluate(() => {
+                        window.scrollBy(0, 1000);
+                    });
                 }
                 catch (e) {
                     //console.log(e)

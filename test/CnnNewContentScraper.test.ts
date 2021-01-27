@@ -19,10 +19,13 @@ describe('the sun new scraper', function () {
             expect(result).toHaveProperty("content")
             expect(result).toHaveProperty("date")
             expect(result).toHaveProperty("scrapedAt")
+            expect(result).toHaveProperty("description")
             expect(result).toHaveProperty("tags")
             expect(result.date).toBeDefined()
             expect(result.tags).toBeDefined()
             expect(result.content).toBeDefined()
+            expect(result.description).not.toBeNull()
+            expect(result.description).not.toBe("")
             expect(result.headline).toBeDefined()
             expect(result.url).toBeDefined()
         });

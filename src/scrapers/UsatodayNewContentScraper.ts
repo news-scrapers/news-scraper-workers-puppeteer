@@ -34,12 +34,12 @@ export class UsatodayNewContentScraper extends ContentScraper {
                 return {} as NewScrapedI
             }
 
-            const [content, headline, author, date] = await Promise.all([this.extractBody(),this.extractHeadline(), this.extractAuthor(), this.extractDate()])
+            const [content, headline, author, date, description] = await Promise.all([this.extractBody(),this.extractHeadline(), this.extractAuthor(), this.extractDate(), this.extractDescription()])
 
             await this.browser.close();
             await this.page.waitFor(this.timeWaitStart);
 
-            let results = {id:v4(), url,headline, content, date,author , scraperId:this.scraperId, newspaper:this.newspaper, scrapedAt:new Date()} as NewScrapedI
+            let results = {id:v4(), url,headline, content, date,author ,description, scraperId:this.scraperId, newspaper:this.newspaper, scrapedAt:new Date()} as NewScrapedI
             return results;
 
         } catch (err) {
@@ -81,6 +81,16 @@ export class UsatodayNewContentScraper extends ContentScraper {
         }
 
     }
+
+    async extractDescription() {
+        try {
+            const description = await this.page.$eval("head > meta[name='description']", (element: any) => element.content);
+            return description
+        } catch (e) {
+            return null
+        }
+    }
+
 
     async extractAuthor(): Promise<string> {
         try {

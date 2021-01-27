@@ -33,12 +33,12 @@ export class BBCNewContentScraper extends ContentScraper {
             await this.page.goto(url, {waitUntil: 'load', timeout: 0});
 
             const div = await this.page.$('article');
-            const [content, headline, tags, date] = await Promise.all([this.extractBody(div),this.extractHeadline(div), this.extractTags(div), this.extractDate(div)])
+            const [content, headline, tags,description, date] = await Promise.all([this.extractBody(div),this.extractHeadline(div), this.extractTags(div),this.extractDescription(), this.extractDate(div)])
 
             await this.browser.close();
             await this.page.waitFor(this.timeWaitStart);
 
-            let results = {id:v4(), url,headline, content, date,tags, scraperId:this.scraperId, newspaper:this.newspaper, scrapedAt:new Date()} as NewScrapedI
+            let results = {id:v4(), url,headline, content, date,tags,description, scraperId:this.scraperId, newspaper:this.newspaper, scrapedAt:new Date()} as NewScrapedI
             return results;
 
         } catch (err) {
@@ -108,6 +108,16 @@ export class BBCNewContentScraper extends ContentScraper {
             const h1Headline = await div.$('h1#main-heading');
             const headline = await (await h1Headline.getProperty('textContent')).jsonValue();
             return headline
+        } catch (e) {
+            return null
+        }
+
+    }
+
+    async extractDescription() {
+        try{
+            const description = await this.page.$eval("head > meta[name='description']", (element:any) => element.content);
+            return description
         } catch (e) {
             return null
         }

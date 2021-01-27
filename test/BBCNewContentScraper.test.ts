@@ -10,19 +10,21 @@ describe('the bbc new scraper', function () {
         const date = new Date()
         const testIndex = {} as ScrapingIndexI
         testIndex.scraperId = "test"
-        const scraper = new BBCNewContentScraper();
+        const scraper = new BBCNewContentScraper("test","");
         jest.setTimeout(59999)
         it('scraping results shoud be not null', async function () {
             const url ="https://www.bbc.com/news/uk-55420193"
-            const result = await scraper.extractNewInUrl(url, "test");
+            const result = await scraper.extractNewInUrl(url);
             console.log(result);
             expect(result).toHaveProperty("content")
             expect(result).toHaveProperty("date")
             expect(result).toHaveProperty("scrapedAt")
+            expect(result).toHaveProperty("description")
             expect(result).toHaveProperty("tags")
             expect(result.date).toBeDefined()
             expect(result.tags).toBeDefined()
             expect(result.content).toBeDefined()
+            expect(result.description).not.toBeNull()
             expect(result.headline).toBeDefined()
             expect(result.url).toBeDefined()
         });

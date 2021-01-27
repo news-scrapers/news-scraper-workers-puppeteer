@@ -18,6 +18,8 @@ const puppeteer_extra_1 = __importDefault(require("puppeteer-extra"));
 const user_agents_1 = __importDefault(require("user-agents"));
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 const AdblockerPlugin = require('puppeteer-extra-plugin-adblocker');
+puppeteer_extra_1.default.use(AdblockerPlugin({ blockTrackers: true }));
+puppeteer_extra_1.default.use(StealthPlugin());
 const userAgent = new user_agents_1.default();
 class PuppeteerScraper {
     constructor() {
@@ -31,9 +33,9 @@ class PuppeteerScraper {
             console.log("initializing puppeteer");
             //puppeteer.use(AdblockerPlugin({ blockTrackers: true }))
             if (this.newspaper == "latimes") {
-                //puppeteer.use(AdblockerPlugin({ blockTrackers: true }))
+                //
             }
-            this.browser = yield puppeteer_extra_1.default.use(StealthPlugin()).launch({
+            this.browser = yield puppeteer_extra_1.default.launch({
                 headless: true,
                 ignoreHTTPSErrors: true,
                 slowMo: 0,

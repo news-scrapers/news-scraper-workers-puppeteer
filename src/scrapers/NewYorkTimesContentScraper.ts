@@ -1,4 +1,4 @@
-import  {PuppeteerScraper} from './PuppeteerScraper'
+import {PuppeteerScraper} from './PuppeteerScraper'
 import htmlToText from 'html-to-text'
 import {NewScrapedI} from "../models/NewScraped";
 import {ScrapingIndexI} from "../models/ScrapingIndex";
@@ -10,8 +10,9 @@ export class NewYorkTimesContentScraper extends ContentScraper {
     public timeWaitClick: number
     public newspaper: string
     public scraperId: string
-    public excludedParagraphs = ['Supported by', "Advertisement","Something went wrong. Please try again later", "We use cookies and similar methods to recognize visitors"]
-    constructor(scraperId: string, newspaper:string) {
+    public excludedParagraphs = ['Supported by', "Advertisement", "Something went wrong. Please try again later", "We use cookies and similar methods to recognize visitors"]
+
+    constructor(scraperId: string, newspaper: string) {
         super();
         this.newspaper = newspaper
         this.scraperId = scraperId
@@ -19,7 +20,7 @@ export class NewYorkTimesContentScraper extends ContentScraper {
         this.timeWaitClick = 500
     }
 
-    async extractNewInUrl(url: string):Promise<NewScrapedI> {
+    async extractNewInUrl(url: string): Promise<NewScrapedI> {
         // https://www.nytimes.com/live/2021/01/26/us/biden-trump-impeachment
         console.log("\n---");
         console.log("extracting full new in url:")
@@ -35,31 +36,44 @@ export class NewYorkTimesContentScraper extends ContentScraper {
 
             try {
                 await this.page.goto(url, {waitUntil: 'load', timeout: 0});
-            } catch (e){
+            } catch (e) {
                 return {} as NewScrapedI
             }
 
 
             const div = await this.page.$('div.pg-rail-tall__body');
 
-            const [headline, content, date, author, image, tags] = await Promise.all([this.extractHeadline(), this.extractBody(), this.extractDate(), this.extractAuthor(), this.extractImage(), this.extractTags()])
+            const [headline, content, date, author, image, tags, description] = await Promise.all([this.extractHeadline(), this.extractBody(), this.extractDate(), this.extractAuthor(), this.extractImage(), this.extractTags(), this.extractDescription()])
 
             await this.browser.close();
             await this.page.waitFor(this.timeWaitStart);
 
-            let results = {id:v4(), url,content, headline, tags, date, image,author, scraperId:this.scraperId, newspaper:this.newspaper, scrapedAt:new Date()} as NewScrapedI
+            let results = {
+                id: v4(),
+                url,
+                content,
+                headline,
+                tags,
+                date,
+                image,
+                author,
+                description,
+                scraperId: this.scraperId,
+                newspaper: this.newspaper,
+                scrapedAt: new Date()
+            } as NewScrapedI
             return results;
 
         } catch (err) {
             console.log(err);
-            await this.page.screenshot({ path: 'error_extract_new.png' });
+            await this.page.screenshot({path: 'error_extract_new.png'});
             await this.browser.close();
             return null;
         }
     }
 
-    async extractBody(){
-        try{
+    async extractBody() {
+        try {
             const pars = await this.page.$$("p")
             let text = ''
             for (let par of pars) {
@@ -68,16 +82,16 @@ export class NewYorkTimesContentScraper extends ContentScraper {
 
             }
             return text
-        } catch (e){
+        } catch (e) {
             console.log(e)
             return null
         }
 
     }
 
-    cleanParagprah = (textPar:string) => {
+    cleanParagprah = (textPar: string) => {
         for (const text of this.excludedParagraphs) {
-            if (textPar.includes(text)){
+            if (textPar.includes(text)) {
                 return ""
             }
         }
@@ -88,20 +102,31 @@ export class NewYorkTimesContentScraper extends ContentScraper {
         return text.replace(/\n/g, " ")
     }
 
+    async extractDescription() {
+        try {
+            const description = await this.page.$eval("head > meta[name='description']", (element: any) => element.content);
+            return description
+        } catch (e) {
+            return null
+        }
+
+    }
+
     async extractDate(): Promise<Date> {
         try {
-            const date = await this.page.$eval("head > meta[property='article:published_time']", (element:any) => element.content);
+            const date = await this.page.$eval("head > meta[property='article:published_time']", (element: any) => element.content);
             return new Date(date)
         } catch (e) {
             return null
         }
 
     }
+
     async extractTags(): Promise<string[]> {
-        try{
-            let tags = await this.page.$eval("head > meta[name='news_keywords']", (element:any) => element.content);
-            if (tags && tags.includes(";")){
-                return tags.split(";").map((elem:string) => (elem.trim()))
+        try {
+            let tags = await this.page.$eval("head > meta[name='news_keywords']", (element: any) => element.content);
+            if (tags && tags.includes(";")) {
+                return tags.split(";").map((elem: string) => (elem.trim()))
             }
             return [tags]
         } catch (e) {
@@ -112,8 +137,8 @@ export class NewYorkTimesContentScraper extends ContentScraper {
 
 
     async extractHeadline() {
-        try{
-            let headline = await this.page.$eval("head > meta[property='twitter:title']", (element:any) => element.content);
+        try {
+            let headline = await this.page.$eval("head > meta[property='twitter:title']", (element: any) => element.content);
             return headline
         } catch (e) {
             return null
@@ -122,8 +147,8 @@ export class NewYorkTimesContentScraper extends ContentScraper {
     }
 
     async extractAuthor() {
-        try{
-            let headline = await this.page.$eval("head > meta[name='author']", (element:any) => element.content);
+        try {
+            let headline = await this.page.$eval("head > meta[name='author']", (element: any) => element.content);
             return headline
         } catch (e) {
             return null
@@ -132,8 +157,8 @@ export class NewYorkTimesContentScraper extends ContentScraper {
     }
 
     async extractImage() {
-        try{
-            let headline = await this.page.$eval("head > meta[property='og:image']", (element:any) => element.content);
+        try {
+            let headline = await this.page.$eval("head > meta[property='og:image']", (element: any) => element.content);
             return headline
         } catch (e) {
             return null
@@ -142,7 +167,7 @@ export class NewYorkTimesContentScraper extends ContentScraper {
     }
 
 
-    async clickOkButtonCookie () {
+    async clickOkButtonCookie() {
         try {
             const frame = this.page.frames()
             //frame[2].click('button[title="Fine By Me!"]');

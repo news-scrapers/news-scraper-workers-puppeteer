@@ -7,6 +7,9 @@ import UserAgent from 'user-agents';
 const StealthPlugin = require('puppeteer-extra-plugin-stealth')
 const AdblockerPlugin = require('puppeteer-extra-plugin-adblocker')
 
+puppeteer.use(AdblockerPlugin({ blockTrackers: true }))
+puppeteer.use(StealthPlugin())
+
 const userAgent = new UserAgent();
 
 export class PuppeteerScraper {
@@ -29,9 +32,9 @@ export class PuppeteerScraper {
         console.log("initializing puppeteer");
         //puppeteer.use(AdblockerPlugin({ blockTrackers: true }))
         if (this.newspaper == "latimes") {
-            //puppeteer.use(AdblockerPlugin({ blockTrackers: true }))
+            //
         }
-        this.browser = await puppeteer.use(StealthPlugin()).launch({
+        this.browser = await puppeteer.launch({
             headless: true,
             ignoreHTTPSErrors: true,
             slowMo: 0,

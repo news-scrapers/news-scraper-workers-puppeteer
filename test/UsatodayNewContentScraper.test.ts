@@ -23,6 +23,8 @@ describe('the nypost new scraper', function () {
             expect(result.date).not.toBeNull()
             expect(result.author).toBeDefined()
             expect(result.content).not.toEqual("")
+            expect(result.description).not.toEqual("")
+            expect(result.description).not.toBeNull()
             expect(result.headline).not.toEqual("")
             expect(result.url).toBeDefined()
         });
