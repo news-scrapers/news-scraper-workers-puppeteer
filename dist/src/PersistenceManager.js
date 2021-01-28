@@ -177,9 +177,9 @@ class PersistenceManager {
     }
     saveNewsScraped(newItem) {
         return __awaiter(this, void 0, void 0, function* () {
-            newItem = this.cleanUpForSaving(newItem);
             const conditions = { url: newItem.url };
-            if (this.config.useSqliteDb) {
+            if (this.config.useSqliteDb && newItem.url) {
+                newItem = this.cleanUpForSaving(newItem);
                 try {
                     const newsSql = NewScrapedSql_1.convertToNewsScrapedSqlI(newItem);
                     const found = yield NewScrapedSql_1.NewScrapedSql.findOne({ where: conditions });

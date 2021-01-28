@@ -180,9 +180,9 @@ export default class PersistenceManager {
     }
 
     async saveNewsScraped(newItem: NewScrapedI) {
-        newItem = this.cleanUpForSaving(newItem)
         const conditions = {url: newItem.url}
-        if (this.config.useSqliteDb) {
+        if (this.config.useSqliteDb && newItem.url) {
+            newItem = this.cleanUpForSaving(newItem)
             try {
                 const newsSql = convertToNewsScrapedSqlI(newItem)
                 const found = await NewScrapedSql.findOne({where: conditions})
