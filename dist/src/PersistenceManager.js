@@ -177,7 +177,7 @@ class PersistenceManager {
     }
     saveNewsScraped(newItem) {
         return __awaiter(this, void 0, void 0, function* () {
-            const conditions = { url: newItem.url };
+            const conditions = { url: newItem.url || "" };
             if (this.config.useSqliteDb && newItem.url) {
                 newItem = this.cleanUpForSaving(newItem);
                 try {
