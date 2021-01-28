@@ -1,6 +1,5 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ScrapingUrlsSql = exports.scrapingUrlSqlAttributes = void 0;
 const sequelize_1 = require("sequelize");
 exports.scrapingUrlSqlAttributes = {
     id: {

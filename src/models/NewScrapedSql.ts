@@ -7,6 +7,7 @@ import {sequelize} from "./sequelizeConfig";
 export interface NewScrapedSqlI {
     newspaper: string
     author: string
+    description: string
     image: string
     date: Date
     scrapedAt: Date

@@ -180,7 +180,7 @@ export default class PersistenceManager {
     }
 
     async saveNewsScraped(newItem: NewScrapedI) {
-
+        newItem = this.cleanUpForSaving(newItem)
         const conditions = {url: newItem.url}
         if (this.config.useSqliteDb) {
             try {
@@ -207,6 +207,12 @@ export default class PersistenceManager {
             }
         }
 
+    }
+
+    cleanUpForSaving(newItem: NewScrapedI) {
+        if (!newItem.id || newItem.id==null) newItem.id = "error"
+        if (!newItem.url || newItem.url==null) newItem.url = ""
+        return newItem
     }
 
 } 

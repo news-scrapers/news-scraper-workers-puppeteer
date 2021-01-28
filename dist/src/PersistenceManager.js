@@ -177,6 +177,7 @@ class PersistenceManager {
     }
     saveNewsScraped(newItem) {
         return __awaiter(this, void 0, void 0, function* () {
+            newItem = this.cleanUpForSaving(newItem);
             const conditions = { url: newItem.url };
             if (this.config.useSqliteDb) {
                 try {
@@ -204,6 +205,13 @@ class PersistenceManager {
                 }
             }
         });
+    }
+    cleanUpForSaving(newItem) {
+        if (!newItem.id || newItem.id == null)
+            newItem.id = "error";
+        if (!newItem.url || newItem.url == null)
+            newItem.url = "";
+        return newItem;
     }
 }
 exports.default = PersistenceManager;

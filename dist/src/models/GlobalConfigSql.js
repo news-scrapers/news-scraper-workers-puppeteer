@@ -1,6 +1,5 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.GlobalConfigSql = exports.globalConfigSqlAttributes = void 0;
 const sequelize_1 = require("sequelize");
 exports.globalConfigSqlAttributes = {
     id: {

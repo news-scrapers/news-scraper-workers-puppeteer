@@ -9,7 +9,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.initDb = exports.sequelize = void 0;
 const sequelize_1 = require("sequelize");
 const NewScrapedSql_1 = require("./NewScrapedSql");
 const ScrapingIndexSql_1 = require("./ScrapingIndexSql");
@@ -19,7 +18,7 @@ exports.sequelize = new sequelize_1.Sequelize({
     storage: './database_news.sqlite3',
     dialect: 'sqlite',
 });
-const initDb = () => __awaiter(void 0, void 0, void 0, function* () {
+exports.initDb = () => __awaiter(void 0, void 0, void 0, function* () {
     NewScrapedSql_1.NewScrapedSql.init(NewScrapedSql_1.newScrapedSqlAttributes, {
         tableName: "NewScraped",
         sequelize: exports.sequelize,
@@ -41,5 +40,4 @@ const initDb = () => __awaiter(void 0, void 0, void 0, function* () {
     yield ScrapingUrlSql_1.ScrapingUrlsSql.sync({ force: false });
     yield GlobalConfigSql_1.GlobalConfigSql.sync({ force: false });
 });
-exports.initDb = initDb;
 //# sourceMappingURL=sequelizeConfig.js.map
