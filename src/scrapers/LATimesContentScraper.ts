@@ -81,7 +81,8 @@ export class LATimesContentScraper extends ContentScraper {
 
     async extractBody(){
         try{
-            const pars = await this.page.$$("p")
+            const div = await this.page.$("article")
+            const pars = await div.$$("p")
             let text = ''
             for (let par of pars) {
                 const textPar = await this.page.evaluate(element => element.textContent, par);
