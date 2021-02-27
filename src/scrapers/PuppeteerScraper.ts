@@ -32,7 +32,7 @@ export class PuppeteerScraper {
         console.log("initializing puppeteer");
 
         this.browser = await puppeteer.launch({
-            headless: true,
+            headless: false,
             ignoreHTTPSErrors: true,
             slowMo: 0,
             args: ['--window-size=1400,900',
@@ -40,7 +40,7 @@ export class PuppeteerScraper {
                 "--remote-debugging-address=0.0.0.0", // You know what your doing?
                 '--disable-gpu', "--disable-features=IsolateOrigins,site-per-process", '--blink-settings=imagesEnabled=false']
         });
-        
+
         this.page = await this.browser.newPage();
 
         this.page.on('error', err => {
@@ -74,7 +74,7 @@ export class PuppeteerScraper {
 
 
     async savePartialResults(results:any){
-       
+
     }
 
 }

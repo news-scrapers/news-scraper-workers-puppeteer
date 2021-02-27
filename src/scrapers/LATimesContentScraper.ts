@@ -36,7 +36,8 @@ export class LATimesContentScraper extends ContentScraper {
             try {
                 await this.page.goto(url, { timeout: 1000*3});
             } catch (e){
-                return {} as NewScrapedI
+                //console.log(e)
+                //return {} as NewScrapedI
             }
             await this.page.waitFor(this.timeWaitStart);
 
