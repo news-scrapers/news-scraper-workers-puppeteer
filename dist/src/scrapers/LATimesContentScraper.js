@@ -49,7 +49,8 @@ class LATimesContentScraper extends ContentScraper_1.ContentScraper {
                     yield this.page.goto(url, { timeout: 1000 * 3 });
                 }
                 catch (e) {
-                    return {};
+                    //console.log(e)
+                    //return {} as NewScrapedI
                 }
                 yield this.page.waitFor(this.timeWaitStart);
                 const [headline, content, date, author, image, tags, description] = yield Promise.all([this.extractHeadline(), this.extractBody(), this.extractDate(), this.extractAuthor(), this.extractImage(), this.extractTags(), this.extractDescription()]);
