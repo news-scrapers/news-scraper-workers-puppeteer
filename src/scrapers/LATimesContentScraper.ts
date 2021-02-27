@@ -34,13 +34,12 @@ export class LATimesContentScraper extends ContentScraper {
         try {
 
             try {
-                await this.page.goto(url, {waitUntil: 'load', timeout: 0});
+                await this.page.goto(url, { timeout: 1000*3});
             } catch (e){
                 return {} as NewScrapedI
             }
             await this.page.waitFor(this.timeWaitStart);
 
-            await this.click()
 
             const [headline, content, date, author, image, tags, description] = await Promise.all([this.extractHeadline(), this.extractBody(), this.extractDate(), this.extractAuthor(), this.extractImage(), this.extractTags(), this.extractDescription()])
 
@@ -57,30 +56,11 @@ export class LATimesContentScraper extends ContentScraper {
         }
     }
 
-    async click(){
-        try {
-            const frames = await this.page.frames();
-            const tryItFrame = frames.find(f => f.name() === 'iframeResult');
-            for (const frame of frames) {
-                console.log(frame.name())
-                let [button] = await frame.$x("//button[contains(., 'Allow adds')]");
-                if (button) {
-                    await button.click();
-                }
-                [button] = await frame.$x("//button[contains(., 'Refresh page')]");
-                if (button) {
-                    //await button.click();
-                }
-            }
 
-        } catch (e) {
-            //console.log(e)
-        }
-
-    }
 
     async extractBody(){
         try{
+            console.log("----")
             const div = await this.page.$("article")
             const pars = await div.$$("p")
             let text = ''
@@ -89,6 +69,7 @@ export class LATimesContentScraper extends ContentScraper {
                 text = text + '\n ' + this.cleanParagprah(textPar)
 
             }
+            console.log("----")
             return text
         } catch (e){
             //console.log(e)

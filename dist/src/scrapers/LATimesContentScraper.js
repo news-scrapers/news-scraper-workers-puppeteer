@@ -46,13 +46,12 @@ class LATimesContentScraper extends ContentScraper_1.ContentScraper {
             }
             try {
                 try {
-                    yield this.page.goto(url, { waitUntil: 'load', timeout: 0 });
+                    yield this.page.goto(url, { timeout: 1000 * 3 });
                 }
                 catch (e) {
                     return {};
                 }
                 yield this.page.waitFor(this.timeWaitStart);
-                yield this.click();
                 const [headline, content, date, author, image, tags, description] = yield Promise.all([this.extractHeadline(), this.extractBody(), this.extractDate(), this.extractAuthor(), this.extractImage(), this.extractTags(), this.extractDescription()]);
                 yield this.browser.close();
                 let results = { id: uuid_1.v4(), url, content, headline, tags, date, image, author, description, scraperId: this.scraperId, newspaper: this.newspaper, scrapedAt: new Date() };
@@ -66,37 +65,18 @@ class LATimesContentScraper extends ContentScraper_1.ContentScraper {
             }
         });
     }
-    click() {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const frames = yield this.page.frames();
-                const tryItFrame = frames.find(f => f.name() === 'iframeResult');
-                for (const frame of frames) {
-                    console.log(frame.name());
-                    let [button] = yield frame.$x("//button[contains(., 'Allow adds')]");
-                    if (button) {
-                        yield button.click();
-                    }
-                    [button] = yield frame.$x("//button[contains(., 'Refresh page')]");
-                    if (button) {
-                        //await button.click();
-                    }
-                }
-            }
-            catch (e) {
-                //console.log(e)
-            }
-        });
-    }
     extractBody() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const pars = yield this.page.$$("p");
+                console.log("----");
+                const div = yield this.page.$("article");
+                const pars = yield div.$$("p");
                 let text = '';
                 for (let par of pars) {
                     const textPar = yield this.page.evaluate(element => element.textContent, par);
                     text = text + '\n ' + this.cleanParagprah(textPar);
                 }
+                console.log("----");
                 return text;
             }
             catch (e) {

@@ -30,10 +30,6 @@ class PuppeteerScraper {
     initializePuppeteer() {
         return __awaiter(this, void 0, void 0, function* () {
             console.log("initializing puppeteer");
-            //puppeteer.use(AdblockerPlugin({ blockTrackers: true }))
-            if (this.newspaper == "latimes") {
-                //
-            }
             this.browser = yield puppeteer_extra_1.default.launch({
                 headless: true,
                 ignoreHTTPSErrors: true,
