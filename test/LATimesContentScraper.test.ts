@@ -15,7 +15,7 @@ describe('La times scraper', function () {
         const scraper = new LATimesContentScraper("test","latimes");
         jest.setTimeout(9999999)
         it('scraping results shoud be not null', async function () {
-            const url ="https://www.latimes.com/california/story/2021-01-25/how-california-covid-stay-at-home-order-ending-affects-la"
+            const url ="https://www.latimes.com/entertainment-arts/books/story/2021-02-27/review-michael-patrick-f-smith-the-good-hand-oil-boom-memoir"
             const result = await scraper.extractNewInUrl(url);
             console.log(result);
             expect(result).toHaveProperty("content")
