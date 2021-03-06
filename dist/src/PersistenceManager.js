@@ -178,6 +178,7 @@ class PersistenceManager {
     saveNewsScraped(newItem) {
         return __awaiter(this, void 0, void 0, function* () {
             if (!newItem.content || newItem.content == "" || newItem.content == null) {
+                console.log("News not saved because does not have content", newItem);
                 return;
             }
             const conditions = { url: newItem.url || "" };

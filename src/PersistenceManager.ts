@@ -182,6 +182,7 @@ export default class PersistenceManager {
     async saveNewsScraped(newItem: NewScrapedI) {
 
         if (!newItem.content || newItem.content == "" || newItem.content == null) {
+            console.log("News not saved because does not have content", newItem)
             return
         }
 
