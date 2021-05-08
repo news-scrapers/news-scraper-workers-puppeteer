@@ -31,7 +31,12 @@ const NewYorkTimesIndexScraper_1 = require("./scrapers/NewYorkTimesIndexScraper"
 const LATimesContentScraper_1 = require("./scrapers/LATimesContentScraper");
 const LATimesIndexScraper_1 = require("./scrapers/LATimesIndexScraper");
 require('dotenv').config();
-mongoose_1.default.connect(process.env["MONGODB_URL"], { useNewUrlParser: true, useUnifiedTopology: true });
+try {
+    mongoose_1.default.connect(process.env["MONGODB_URL"], { useNewUrlParser: true, useUnifiedTopology: true });
+}
+catch (e) {
+    console.log("error connectiing to mongo database");
+}
 class ScraperApp {
     constructor() {
         this.config = scrapingConfigFull_json_1.default;

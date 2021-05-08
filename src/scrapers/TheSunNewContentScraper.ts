@@ -142,11 +142,10 @@ export class TheSunNewContentScraper extends ContentScraper {
 
     async extractHeadline(div: any) {
         try {
-            const h1Headline = await div.$('p.article__content--intro');
-            const headline = await (await h1Headline.getProperty('textContent')).jsonValue();
+            let headline = await this.page.$eval("head > meta[property='og:title']", (element: any) => element.content);
             return headline
         } catch (e) {
-            return ""
+            return null
         }
 
     }

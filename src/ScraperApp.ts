@@ -27,7 +27,11 @@ import {LATimesContentScraper} from "./scrapers/LATimesContentScraper";
 import {LATimesIndexScraper} from "./scrapers/LATimesIndexScraper";
 
 require('dotenv').config();
-mongoose.connect(process.env["MONGODB_URL"], {useNewUrlParser: true, useUnifiedTopology: true});
+try {
+    mongoose.connect(process.env["MONGODB_URL"], {useNewUrlParser: true, useUnifiedTopology: true});
+} catch (e) {
+    console.log("error connectiing to mongo database")
+}
 
 export interface ScraperTuple {
     pageScraper: ContentScraper;

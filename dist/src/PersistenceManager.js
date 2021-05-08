@@ -21,7 +21,11 @@ const ScrapingUrlSql_1 = require("./models/ScrapingUrlSql");
 const GlobalConfigSql_1 = require("./models/GlobalConfigSql");
 const GlobalConfig_1 = require("./models/GlobalConfig");
 require('dotenv').config();
-mongoose_1.default.connect(process.env["MONGODB_URL"], { useNewUrlParser: true, useUnifiedTopology: true });
+try {
+    mongoose_1.default.connect(process.env["MONGODB_URL"], { useNewUrlParser: true, useUnifiedTopology: true });
+}
+catch (e) {
+}
 class PersistenceManager {
     constructor(config) {
         this.config = {};

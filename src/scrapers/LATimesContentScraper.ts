@@ -104,7 +104,7 @@ export class LATimesContentScraper extends ContentScraper {
 
     async extractTags(): Promise<string[]> {
         try{
-            let tags = await this.page.$eval("head > meta[name='news_keywords']", (element:any) => element.content);
+            let tags = await this.page.$eval("head > meta[property='article:section']", (element:any) => element.content);
             if (tags && tags.includes(";")){
                 return tags.split(";").map((elem:string) => (elem.trim()))
             }

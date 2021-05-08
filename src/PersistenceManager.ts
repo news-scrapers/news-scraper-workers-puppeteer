@@ -18,7 +18,12 @@ import {GlobalConfigSql} from "./models/GlobalConfigSql";
 import {GlobalConfig, GlobalConfigI} from "./models/GlobalConfig";
 
 require('dotenv').config();
-mongoose.connect(process.env["MONGODB_URL"], {useNewUrlParser: true, useUnifiedTopology: true});
+
+try {
+    mongoose.connect(process.env["MONGODB_URL"], {useNewUrlParser: true, useUnifiedTopology: true});
+}catch (e) {
+
+}
 
 export default class PersistenceManager {
     public config: ScrapingConfigI = {} as ScrapingConfigI

@@ -24,6 +24,7 @@ describe('La times scraper', function () {
             expect(result).toHaveProperty("tags")
             expect(result.date).toBeDefined()
             expect(result.tags).toBeDefined()
+            expect(result.tags).not.toEqual(null)
             expect(result.content).toBeDefined()
             expect(result.headline).toBeDefined()
             expect(result.url).toBeDefined()

@@ -71,7 +71,7 @@ export class GuardianNewContentScraper extends ContentScraper {
 
     async extractBody(div: any) {
         try {
-            const pars = await this.page.$$(".css-38z03z")
+            const pars = await this.page.$$(".css-1a9amut")
             let text = ''
             for (let par of pars) {
                 const textPar = await this.page.evaluate(element => element.textContent, par);

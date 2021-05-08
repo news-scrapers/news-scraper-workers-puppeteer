@@ -28,6 +28,14 @@ describe('the sun new scraper', function () {
             expect(result.description).not.toBe("")
             expect(result.headline).toBeDefined()
             expect(result.url).toBeDefined()
+
+            expect(result.tags).not.toEqual(null)
+            expect(result.content).not.toEqual(null)
+            expect(result.content).not.toEqual(undefined)
+            expect(result.content).not.toEqual('')
+            expect(result.date).not.toEqual(null)
+            expect(result.headline).not.toBeNull()
+            expect(result.headline).not.toBe("")
         });
     });
 });

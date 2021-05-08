@@ -23,6 +23,12 @@ describe('the guardian new scraper', function () {
             expect(result).toHaveProperty("description")
             expect(result).toHaveProperty("scrapedAt")
             expect(result).toHaveProperty("tags")
+            expect(result.tags).not.toEqual(null)
+            expect(result.content).not.toEqual(null)
+            expect(result.content).not.toEqual(undefined)
+            expect(result.content).not.toEqual('')
+            expect(result.date).not.toEqual(null)
+
             expect(result.date).toBeDefined()
             expect(result.tags).toBeDefined()
             expect(result.content).toBeDefined()
