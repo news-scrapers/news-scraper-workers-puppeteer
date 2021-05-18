@@ -100,7 +100,7 @@ class LATimesContentScraper extends ContentScraper_1.ContentScraper {
     extractTags() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                let tags = yield this.page.$eval("head > meta[name='news_keywords']", (element) => element.content);
+                let tags = yield this.page.$eval("head > meta[property='article:section']", (element) => element.content);
                 if (tags && tags.includes(";")) {
                     return tags.split(";").map((elem) => (elem.trim()));
                 }

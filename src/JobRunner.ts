@@ -16,7 +16,7 @@ export class JobRunner {
     }
 
     async jobRestartPm2() {
-        const command = "/home/goku/.nvm/versions/node/v12.20.0/bin/pm2 restart all"
+        const command = "/home/goku/.nvm/versions/node/v15.14.0/bin/pm2 restart all"
         return await this.runCommand(command)
     }
 

@@ -145,12 +145,11 @@ class TheSunNewContentScraper extends ContentScraper_1.ContentScraper {
     extractHeadline(div) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const h1Headline = yield div.$('p.article__content--intro');
-                const headline = yield (yield h1Headline.getProperty('textContent')).jsonValue();
+                let headline = yield this.page.$eval("head > meta[property='og:title']", (element) => element.content);
                 return headline;
             }
             catch (e) {
-                return "";
+                return null;
             }
         });
     }

@@ -74,7 +74,7 @@ class GuardianNewContentScraper extends ContentScraper_1.ContentScraper {
     extractBody(div) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const pars = yield this.page.$$(".css-38z03z");
+                const pars = yield this.page.$$(".css-1a9amut");
                 let text = '';
                 for (let par of pars) {
                     const textPar = yield this.page.evaluate(element => element.textContent, par);
