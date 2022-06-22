@@ -48,7 +48,7 @@
     "sequelize": "5.22.3",
     "sequelize-typescript": "^1.1.0",
     "sqlite": "^4.0.19",
-    "sqlite3": "^5.0.1",
+    "sqlite3": "^5.0.3",
     "ts-jest": "^24.1.0",
     "ts-node": "^8.4.1",
     "user-agents": "^1.0.559",
